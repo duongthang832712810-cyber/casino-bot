@@ -13,11 +13,14 @@ from src.core.constants import GAME_SICBO, RESULT_LOSE, RESULT_WIN
 from src.core.errors import ActiveGameExistsError, BotError, InvalidBetAmountError, NotEnoughCoinsError
 from src.db.connection import Database
 from src.db.transaction import immediate_transaction
-from src.games.sicbo.constants import CHOICE_ALIASES, CHOICE_BIG, CHOICE_SMALL, RESULT_HOUSE, STATUS_BETTING
+from src.games.sicbo.constants import RESULT_HOUSE, STATUS_BETTING
 from src.games.sicbo.models import SicboBetResult, SicboResolveResult, SicboRoundView, SicboState
 from src.games.sicbo.renderer import render_sicbo_embed
+from src.games.sicbo.rules import normalize_choice, result_for_total
 from src.repositories.sicbo_repository import SicboRepository
 from src.repositories.user_repository import UserRepository
+from src.services.exp_service import ExpService
+from src.services.progression_service import ProgressionService, ProgressionUpdate
 from src.utils.money import format_coin
 
 LOGGER = logging.getLogger(__name__)
@@ -87,7 +90,7 @@ class SicboService:
                 await self.sicbo.upsert_announcement(str(guild_id), str(channel_id), str(message.id))
 
     async def place_bet(self, guild_id: int, user_id: str, raw_choice: str, amount: int) -> SicboBetResult:
-        choice = self.normalize_choice(raw_choice)
+        choice = normalize_choice(raw_choice)
         self._validate_bet(amount)
         await self.ensure_state()
         await self.users.get_or_create(user_id, self.default_coins)
@@ -158,12 +161,29 @@ class SicboService:
         announcements = await self.sicbo.list_announcements()
         for announcement in announcements:
             try:
+                await self._delete_round_message(announcement.channel_id, announcement.message_id)
                 channel = self.client.get_channel(int(announcement.channel_id)) or await self.client.fetch_channel(int(announcement.channel_id))
                 message = await channel.send(embed=render_sicbo_embed(state, bets))  # type: ignore[attr-defined]
                 async with immediate_transaction(self.db):
                     await self.sicbo.update_announcement_message(announcement.guild_id, str(message.id))
             except Exception:
                 LOGGER.exception("Failed to send new Sicbo round message for guild_id=%s", announcement.guild_id)
+
+    async def send_result_round_messages(self) -> None:
+        state = await self.sicbo.get_state()
+        if state is None:
+            return
+        bets = await self.sicbo.list_bets(state.round_id)
+        announcements = await self.sicbo.list_announcements()
+        for announcement in announcements:
+            try:
+                await self._delete_round_message(announcement.channel_id, announcement.message_id)
+                channel = self.client.get_channel(int(announcement.channel_id)) or await self.client.fetch_channel(int(announcement.channel_id))
+                message = await channel.send(embed=render_sicbo_embed(state, bets))  # type: ignore[attr-defined]
+                async with immediate_transaction(self.db):
+                    await self.sicbo.update_announcement_message(announcement.guild_id, str(message.id))
+            except Exception:
+                LOGGER.exception("Failed to send Sicbo result message for guild_id=%s", announcement.guild_id)
 
     async def _delete_round_message(self, channel_id: str | None, message_id: str | None) -> None:
         if not channel_id or not message_id:
@@ -200,14 +220,16 @@ class SicboService:
                 return None
             result = await self._resolve_current_round(state)
 
-        await self.update_round_message()
+        await self.send_result_round_messages()
+        await self._send_level_change_messages(result)
         return result
 
     async def _resolve_current_round(self, state: SicboState) -> SicboResolveResult:
         dice = (random.randint(1, 6), random.randint(1, 6), random.randint(1, 6))
         total = sum(dice)
-        outcome = self.result_for_total(total)
+        outcome = result_for_total(total)
         total_payout = 0
+        progressions: dict[str, ProgressionUpdate] = {}
 
         async with immediate_transaction(self.db):
             current_state = await self.sicbo.get_state()
@@ -222,8 +244,8 @@ class SicboService:
                 payout = bet.amount * sicbo_config.PAYOUT_MULTIPLIER if is_win else 0
                 total_payout += payout
                 result = RESULT_WIN if is_win else RESULT_LOSE
-                exp_delta = sicbo_config.EXP_WIN if is_win else sicbo_config.EXP_LOSE
-                await self.users.update_after_result(bet.user_id, payout, exp_delta, result)
+                exp_delta = ExpService.exp_delta_for_result(bet.amount, result)
+                progressions[bet.user_id] = await self.users.update_after_result(bet.user_id, payout, exp_delta, result)
 
             await self.sicbo.finish_round(outcome, dice)
 
@@ -234,7 +256,25 @@ class SicboService:
             dice=dice,
             total=total,
             total_payout=total_payout,
+            progressions=progressions,
         )
+
+    async def _send_level_change_messages(self, result: SicboResolveResult) -> None:
+        messages = [
+            message
+            for user_id, progression in result.progressions.items()
+            if (message := ProgressionService.level_change_message(user_id, progression)) is not None
+        ]
+        if not messages:
+            return
+        announcements = await self.sicbo.list_announcements()
+        content = "\n".join(messages)
+        for announcement in announcements:
+            try:
+                channel = self.client.get_channel(int(announcement.channel_id)) or await self.client.fetch_channel(int(announcement.channel_id))
+                await channel.send(content)  # type: ignore[attr-defined]
+            except Exception:
+                LOGGER.exception("Failed to send Sicbo level change messages for guild_id=%s", announcement.guild_id)
 
     async def start_next_round(self) -> SicboState:
         async with self._lock:
@@ -248,21 +288,6 @@ class SicboService:
 
         await self.send_new_round_messages()
         return new_state
-
-    @staticmethod
-    def normalize_choice(raw_choice: str) -> str:
-        choice = CHOICE_ALIASES.get(raw_choice.lower().strip())
-        if choice is None:
-            raise InvalidBetAmountError("Choose big/tai or small/xiu.")
-        return choice
-
-    @staticmethod
-    def result_for_total(total: int) -> str:
-        if total in {3, 18}:
-            return RESULT_HOUSE
-        if 4 <= total <= 10:
-            return CHOICE_SMALL
-        return CHOICE_BIG
 
     @staticmethod
     def _validate_bet(amount: int) -> None:

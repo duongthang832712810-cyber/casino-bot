@@ -182,8 +182,7 @@ class LotteryService:
                 return None
             result = await self._resolve_current_draw(state)
 
-        await self._send_result_if_needed(result)
-        await self._replace_announcement()
+        await self._replace_announcement_with_result(result)
         return result
 
     async def _resolve_current_draw(self, state: LotteryState) -> LotteryDrawResult:
@@ -249,18 +248,7 @@ class LotteryService:
                 jackpot_hit=jackpot_hit,
             )
 
-    async def _send_result_if_needed(self, result: LotteryDrawResult) -> None:
-        if result.tickets_sold <= 0:
-            return
-        announcements = await self.lottery.list_announcements()
-        for announcement in announcements:
-            try:
-                channel = self.client.get_channel(int(announcement.channel_id)) or await self.client.fetch_channel(int(announcement.channel_id))
-                await channel.send(embed=render_draw_result_embed(result))  # type: ignore[attr-defined]
-            except Exception:
-                LOGGER.exception("Failed to send lottery result for guild_id=%s", announcement.guild_id)
-
-    async def _replace_announcement(self) -> None:
+    async def _replace_announcement_with_result(self, result: LotteryDrawResult) -> None:
         state = await self.lottery.get_state()
         if state is None:
             return
@@ -269,6 +257,8 @@ class LotteryService:
             await self._delete_announcement(announcement.channel_id, announcement.message_id)
             try:
                 channel = self.client.get_channel(int(announcement.channel_id)) or await self.client.fetch_channel(int(announcement.channel_id))
+                if result.tickets_sold > 0:
+                    await channel.send(embed=render_draw_result_embed(result))  # type: ignore[attr-defined]
                 message = await channel.send(embed=render_announcement_embed(state))  # type: ignore[attr-defined]
                 async with immediate_transaction(self.db):
                     await self.lottery.update_announcement_message(announcement.guild_id, str(message.id))

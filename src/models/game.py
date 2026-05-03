@@ -1,14 +1,18 @@
 from __future__ import annotations
 
-from enum import StrEnum
+from enum import Enum
 
 
-class GameType(StrEnum):
+class GameType(str, Enum):
     BLACKJACK = "blackjack"
+    COINFLIP = "coinflip"
+    LOTTERY = "lottery"
+    SICBO = "sicbo"
 
 
-class GameResult(StrEnum):
+class GameResult(str, Enum):
     BLACKJACK = "blackjack"
     WIN = "win"
     LOSE = "lose"
     DRAW = "draw"
+    HOUSE = "house"

@@ -8,6 +8,7 @@ class User:
     user_id: str
     coins: int
     exp: int
+    level: int
     wins: int
     losses: int
     draws: int

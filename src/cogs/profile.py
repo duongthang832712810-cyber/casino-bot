@@ -1,21 +1,13 @@
 from __future__ import annotations
 
-import random
-
 import discord
 from discord import app_commands
 from discord.ext import commands
 
 from src.config.emojis import COIN_ICON_URL, EXP_EMOJI, TICKET_EMOJI
+from src.services.progression_service import ProgressionService
+from src.utils.footer import random_footer_text
 from src.utils.money import format_coin, format_number
-
-
-PROFILE_FOOTER_MESSAGES = (
-    "Keep stacking your coins.",
-    "Every hand tells a story.",
-    "Your casino journey continues.",
-    "Play smart, build your fortune.",
-)
 
 
 class ProfileCog(commands.Cog):
@@ -31,7 +23,7 @@ class ProfileCog(commands.Cog):
         user_id = str(ctx.author.id)
         user = await self.bot.user_repository.get_or_create(user_id, self.bot.settings.default_coins)  # type: ignore[attr-defined,union-attr]
         tickets_count = await self._current_lottery_ticket_count(user_id)
-        await ctx.reply(embed=self._build_embed(ctx.author, user, tickets_count), mention_author=False)
+        await ctx.reply(embed=self._build_embed(ctx.author, user, tickets_count), mention_author=True)
 
     async def _send_profile(self, interaction: discord.Interaction, user_id: str, member: discord.abc.User) -> None:
         user = await self.bot.user_repository.get_or_create(user_id, self.bot.settings.default_coins)  # type: ignore[attr-defined,union-attr]
@@ -47,7 +39,14 @@ class ProfileCog(commands.Cog):
 
     @staticmethod
     def _build_embed(member: discord.abc.User, user, tickets_count: int) -> discord.Embed:
-        embed = discord.Embed(color=discord.Color.green())
+        progress = ProgressionService.level_progress(user.level, user.exp)
+        embed = discord.Embed(
+            description=(
+                f"Lv.{format_number(progress.level)} {progress.bar} "
+                f"{format_number(progress.exp)}/{format_number(progress.required_exp)} {EXP_EMOJI}"
+            ),
+            color=discord.Color.green(),
+        )
         embed.set_author(name=f"{member.display_name}'s Profile", icon_url=member.display_avatar.url)
         embed.add_field(
             name="Stats",
@@ -62,18 +61,12 @@ class ProfileCog(commands.Cog):
             name="Coins",
             value=(
                 f"{format_coin(user.coins)}\n"
-                f"**Exp**\n{format_number(user.exp)} {EXP_EMOJI}\n"
                 f"**Ticket**\n{format_number(tickets_count)} {TICKET_EMOJI}"
             ),
             inline=True,
         )
-        footer = ProfileCog._footer_message()
-        embed.set_footer(text=footer, icon_url=COIN_ICON_URL)
+        embed.set_footer(text=random_footer_text(), icon_url=COIN_ICON_URL)
         return embed
-
-    @staticmethod
-    def _footer_message() -> str:
-        return random.choice(PROFILE_FOOTER_MESSAGES)
 
 
 async def setup(bot: commands.Bot) -> None:

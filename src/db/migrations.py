@@ -22,3 +22,5 @@ async def _ensure_users_columns(db: Database) -> None:
 
     if "daily_claimed_at" not in column_names:
         await conn.execute("ALTER TABLE users ADD COLUMN daily_claimed_at INTEGER NOT NULL DEFAULT 0")
+    if "level" not in column_names:
+        await conn.execute("ALTER TABLE users ADD COLUMN level INTEGER NOT NULL DEFAULT 0 CHECK (level >= 0)")

@@ -13,7 +13,7 @@ def render_announcement_embed(state: LotteryState) -> discord.Embed:
         description=f"Ends <t:{state.ends_at}:R>",
         color=discord.Color.gold(),
     )
-    embed.set_author(name=f"Lottery Draw #{state.draw_id}")
+    embed.set_author(name=f"Lottery Draw #{format_number(state.draw_id)}")
     embed.add_field(name="Jackpot Pool", value=format_coin(state.jackpot_pool), inline=True)
     embed.add_field(name="Ticket Price", value=format_coin(lottery_config.TICKET_PRICE), inline=True)
     embed.add_field(name="Participants", value=f"{format_number(state.participants)} {PARTICIPANT_EMOJI}", inline=True)
@@ -28,7 +28,7 @@ def render_announcement_embed(state: LotteryState) -> discord.Embed:
 def render_purchase_embed(result: LotteryPurchaseResult, player: discord.abc.User) -> discord.Embed:
     embed = discord.Embed(color=discord.Color.gold())
     embed.set_author(name=f"{player.display_name}'s Lottery Tickets", icon_url=player.display_avatar.url)
-    embed.add_field(name="Draw", value=f"#{result.state.draw_id}", inline=True)
+    embed.add_field(name="Draw", value=f"#{format_number(result.state.draw_id)}", inline=True)
     embed.add_field(name="Tickets", value=f"{format_number(result.total_quantity)} {TICKET_EMOJI}", inline=True)
     embed.add_field(name="Cost", value=format_coin(result.total_cost), inline=True)
     embed.add_field(name="Numbers", value=_format_numbers(result.numbers), inline=False)
@@ -39,7 +39,7 @@ def render_purchase_embed(result: LotteryPurchaseResult, player: discord.abc.Use
 def render_user_tickets_embed(state: LotteryState, tickets: list[LotteryTicket], player: discord.abc.User) -> discord.Embed:
     embed = discord.Embed(color=discord.Color.gold())
     embed.set_author(name=f"{player.display_name}'s Lottery Tickets", icon_url=player.display_avatar.url)
-    embed.add_field(name="Draw", value=f"#{state.draw_id}", inline=True)
+    embed.add_field(name="Draw", value=f"#{format_number(state.draw_id)}", inline=True)
     embed.add_field(name="Ends", value=f"<t:{state.ends_at}:R>", inline=True)
     if not tickets:
         embed.add_field(name="Tickets", value="No tickets bought yet.", inline=False)
@@ -56,7 +56,7 @@ def render_user_tickets_embed(state: LotteryState, tickets: list[LotteryTicket],
 
 def render_draw_result_embed(result: LotteryDrawResult) -> discord.Embed:
     embed = discord.Embed(color=discord.Color.gold())
-    embed.set_author(name=f"Lottery Draw #{result.old_draw_id} Result")
+    embed.set_author(name=f"Lottery Draw #{format_number(result.old_draw_id)} Result")
     embed.add_field(name="Winning Number", value=result.winning_number, inline=True)
     embed.add_field(name="Tickets Sold", value=f"{format_number(result.tickets_sold)} {TICKET_EMOJI}", inline=True)
     embed.add_field(name="Participants", value=f"{format_number(result.participants)} {PARTICIPANT_EMOJI}", inline=True)

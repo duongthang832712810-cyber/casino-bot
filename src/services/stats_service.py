@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+from src.core.constants import RESULT_BLACKJACK, RESULT_WIN
+
 
 class StatsService:
     @staticmethod
     def normalize_result_for_stats(result: str) -> str:
-        return "win" if result == "blackjack" else result
+        return RESULT_WIN if result == RESULT_BLACKJACK else result

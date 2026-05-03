@@ -4,8 +4,10 @@ import time
 
 from aiosqlite import Row
 
+from src.core.constants import RESULT_BLACKJACK, RESULT_DRAW, RESULT_LOSE, RESULT_WIN
 from src.db.connection import Database
 from src.models.user import User
+from src.services.progression_service import ProgressionService, ProgressionUpdate
 
 
 def _row_to_user(row: Row) -> User:
@@ -13,6 +15,7 @@ def _row_to_user(row: Row) -> User:
         user_id=row["user_id"],
         coins=row["coins"],
         exp=row["exp"],
+        level=row["level"],
         wins=row["wins"],
         losses=row["losses"],
         draws=row["draws"],
@@ -40,8 +43,8 @@ class UserRepository:
         conn = self.db.get_connection()
         await conn.execute(
             """
-            INSERT INTO users (user_id, coins, exp, wins, losses, draws, total_games, has_game, active_game_type, daily_claimed_at, created_at, updated_at)
-            VALUES (?, ?, 0, 0, 0, 0, 0, 0, NULL, 0, ?, ?)
+            INSERT INTO users (user_id, coins, exp, level, wins, losses, draws, total_games, has_game, active_game_type, daily_claimed_at, created_at, updated_at)
+            VALUES (?, ?, 0, 0, 0, 0, 0, 0, 0, NULL, 0, ?, ?)
             """,
             (user_id, default_coins, now, now),
         )
@@ -66,17 +69,22 @@ class UserRepository:
             (has_game, game_type, now, user_id),
         )
 
-    async def update_after_result(self, user_id: str, payout: int, exp_delta: int, result: str) -> None:
+    async def update_after_result(self, user_id: str, payout: int, exp_delta: int, result: str) -> ProgressionUpdate:
         now = int(time.time())
-        win_inc = 1 if result in {"win", "blackjack"} else 0
-        loss_inc = 1 if result == "lose" else 0
-        draw_inc = 1 if result == "draw" else 0
+        win_inc = 1 if result in {RESULT_WIN, RESULT_BLACKJACK} else 0
+        loss_inc = 1 if result == RESULT_LOSE else 0
+        draw_inc = 1 if result == RESULT_DRAW else 0
         conn = self.db.get_connection()
+        user = await self.get_by_id(user_id)
+        if user is None:
+            raise RuntimeError("User not found")
+        progression = ProgressionService.apply_exp_delta(user.level, user.exp, exp_delta)
         await conn.execute(
             """
             UPDATE users
             SET coins = MAX(0, coins + ?),
-                exp = MAX(0, exp + ?),
+                exp = ?,
+                level = ?,
                 wins = wins + ?,
                 losses = losses + ?,
                 draws = draws + ?,
@@ -86,8 +94,9 @@ class UserRepository:
                 updated_at = ?
             WHERE user_id = ?
             """,
-            (payout, exp_delta, win_inc, loss_inc, draw_inc, now, user_id),
+            (payout, progression.new_exp, progression.new_level, win_inc, loss_inc, draw_inc, now, user_id),
         )
+        return progression
 
     async def add_coins(self, user_id: str, amount: int) -> None:
         now = int(time.time())

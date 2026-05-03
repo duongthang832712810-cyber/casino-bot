@@ -118,12 +118,20 @@ class BlackjackService:
 
                 payout, _net = blackjack_payout(game.bet_amount, result)
                 exp_delta = ExpService.exp_delta_for_result(game.bet_amount, result)
-                await self.users.update_after_result(user_id, payout, exp_delta, result)
+                progression = await self.users.update_after_result(user_id, payout, exp_delta, result)
                 await self.games.delete(user_id)
 
             payout, net = blackjack_payout(game.bet_amount, result)
             exp_delta = ExpService.exp_delta_for_result(game.bet_amount, result)
-            return BlackjackActionResult(game=game, finished=True, result=result, payout=payout, net=net, exp_delta=exp_delta)
+            return BlackjackActionResult(
+                game=game,
+                finished=True,
+                result=result,
+                payout=payout,
+                net=net,
+                exp_delta=exp_delta,
+                progression=progression,
+            )
 
     async def save_message(self, user_id: str, channel_id: int | None, message_id: int | None) -> None:
         async with immediate_transaction(self.db):
@@ -137,9 +145,17 @@ class BlackjackService:
         payout, net = blackjack_payout(game.bet_amount, result)
         exp_delta = ExpService.exp_delta_for_result(game.bet_amount, result)
         async with immediate_transaction(self.db):
-            await self.users.update_after_result(user_id, payout, exp_delta, result)
+            progression = await self.users.update_after_result(user_id, payout, exp_delta, result)
             await self.games.delete(user_id)
-        return BlackjackActionResult(game=game, finished=True, result=result, payout=payout, net=net, exp_delta=exp_delta)
+        return BlackjackActionResult(
+            game=game,
+            finished=True,
+            result=result,
+            payout=payout,
+            net=net,
+            exp_delta=exp_delta,
+            progression=progression,
+        )
 
     async def _require_game(self, user_id: str) -> BlackjackGame:
         game = await self.games.get_by_user_id(user_id)

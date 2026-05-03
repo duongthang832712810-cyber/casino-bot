@@ -125,21 +125,21 @@ class CasinoBot(commands.Bot):
         if isinstance(error, commands.CommandNotFound):
             return
         if isinstance(error, (commands.MissingPermissions, commands.BotMissingPermissions)):
-            await ctx.reply("You do not have permission to use this command.", mention_author=False)
+            await ctx.reply("You do not have permission to use this command.", mention_author=True)
             return
         if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.reply(f"Missing required argument: `{error.param.name}`.", mention_author=False)
+            await ctx.reply(f"Missing required argument: `{error.param.name}`.", mention_author=True)
             return
         if isinstance(error, commands.BadArgument):
-            await ctx.reply(f"Invalid command argument. Use `{ctx.clean_prefix}help` to view command usage.", mention_author=False)
+            await ctx.reply(f"Invalid command argument. Use `{ctx.clean_prefix}help` to view command usage.", mention_author=True)
             return
         if isinstance(error, commands.CommandInvokeError) and isinstance(error.original, Exception):
             LOGGER.error("Unexpected prefix command error", exc_info=_exception_info(error.original))
-            await ctx.reply("An unexpected error occurred. Please try again later.", mention_author=False)
+            await ctx.reply("An unexpected error occurred. Please try again later.", mention_author=True)
             return
 
         LOGGER.error("Unexpected prefix command error", exc_info=_exception_info(error))
-        await ctx.reply("An unexpected error occurred. Please try again later.", mention_author=False)
+        await ctx.reply("An unexpected error occurred. Please try again later.", mention_author=True)
 
     async def on_app_command_error(self, interaction: discord.Interaction, error: app_commands.AppCommandError) -> None:
         if isinstance(error, app_commands.MissingPermissions):

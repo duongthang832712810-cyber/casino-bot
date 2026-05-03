@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from src.services.progression_service import ProgressionUpdate
+
 
 Card = str
 
@@ -27,4 +29,5 @@ class BlackjackActionResult:
     payout: int = 0
     net: int = 0
     exp_delta: int = 0
+    progression: ProgressionUpdate | None = None
     message: str | None = None

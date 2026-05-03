@@ -21,6 +21,7 @@ from src.repositories.coinflip_repository import CoinFlipRepository
 from src.repositories.user_repository import UserRepository
 from src.services.exp_service import ExpService
 from src.services.game_lock_service import GameLockService
+from src.services.progression_service import ProgressionService
 from src.utils.money import format_coin
 
 LOGGER = logging.getLogger(__name__)
@@ -136,7 +137,7 @@ class CoinFlipService:
                 existing_game = await self.games.get_by_user_id(user_id)
                 if existing_game is None:
                     raise GameNotFoundError("This Coin Flip has already ended.")
-                await self.users.update_after_result(user_id, payout, exp_delta, result)
+                progression = await self.users.update_after_result(user_id, payout, exp_delta, result)
                 await self.games.delete(user_id)
 
             return CoinFlipActionResult(
@@ -148,6 +149,7 @@ class CoinFlipService:
                 payout=payout,
                 net=net,
                 exp_delta=exp_delta,
+                progression=progression,
             )
 
     async def _edit_result_message(self, action: CoinFlipActionResult) -> None:
@@ -171,6 +173,9 @@ class CoinFlipService:
             )
             content = COINFLIP_HEADS_EMOJI if action.outcome == CHOICE_HEADS else COINFLIP_TAILS_EMOJI
             await message.edit(content=content, embed=embed)
+            level_message = ProgressionService.level_change_message(game.user_id, action.progression)
+            if level_message is not None:
+                await message.reply(level_message, mention_author=False)
         except Exception:
             LOGGER.exception("Failed to edit coinflip result message for user_id=%s", game.user_id)
 

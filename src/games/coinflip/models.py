@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from src.services.progression_service import ProgressionUpdate
+
 
 @dataclass(slots=True)
 class CoinFlipGame:
@@ -25,3 +27,4 @@ class CoinFlipActionResult:
     payout: int = 0
     net: int = 0
     exp_delta: int = 0
+    progression: ProgressionUpdate | None = None

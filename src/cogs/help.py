@@ -31,12 +31,15 @@ class HelpCog(commands.Cog):
         self.bot = bot
 
     @app_commands.command(name="help", description="View casino game help.")
-    async def slash_help(self, interaction: discord.Interaction) -> None:
-        await interaction.response.send_message(embed=_help_embed(1), view=HelpView(interaction.user.id), ephemeral=True)
+    @app_commands.describe(page="Help page number")
+    async def slash_help(self, interaction: discord.Interaction, page: int = 1) -> None:
+        page = _normalize_page(page)
+        await interaction.response.send_message(embed=_help_embed(page), view=HelpView(interaction.user.id, page), ephemeral=True)
 
     @commands.command(name="help")
-    async def prefix_help(self, ctx: commands.Context) -> None:
-        await ctx.reply(embed=_help_embed(1), view=HelpView(ctx.author.id), mention_author=False)
+    async def prefix_help(self, ctx: commands.Context, page: int = 1) -> None:
+        page = _normalize_page(page)
+        await ctx.reply(embed=_help_embed(page), view=HelpView(ctx.author.id, page), mention_author=True)
 
 
 class HelpView(discord.ui.View):
@@ -93,8 +96,12 @@ def _page_emoji(page: int) -> str:
     return emojis[page]
 
 
+def _normalize_page(page: int) -> int:
+    return min(max(page, 1), HELP_PAGE_COUNT)
+
+
 def _help_embed(page: int) -> discord.Embed:
-    page = min(max(page, 1), HELP_PAGE_COUNT)
+    page = _normalize_page(page)
     if page == 1:
         return _blackjack_help_embed()
     if page == 2:
@@ -117,8 +124,8 @@ def _blackjack_help_embed() -> discord.Embed:
     embed.add_field(
         name="How to play",
         value=(
-            "`/bj <amount>`\n"
-            "`!bj <amount>`\n"
+            "`/bj bet <amount>`\n"
+            "`!bj bet <amount>`\n"
             f"Minimum bet: {format_coin(blackjack_config.MIN_BET)}"
             f"{_max_bet_text(blackjack_config.MAX_BET)}"
         ),
@@ -164,8 +171,8 @@ def _coinflip_help_embed() -> discord.Embed:
     embed.add_field(
         name="How to play",
         value=(
-            "`/cf <h|t> <amount>`\n"
-            "`!cf <h|t> <amount>`\n"
+            "`/cf bet <h|t> <amount>`\n"
+            "`!cf bet <h|t> <amount>`\n"
             f"Minimum bet: {format_coin(coinflip_config.MIN_BET)}"
             f"{_max_bet_text(coinflip_config.MAX_BET)}\n"
             f"Flip delay: {format_number(coinflip_config.RESOLVE_DELAY_MIN_SECONDS)}-{format_number(coinflip_config.RESOLVE_DELAY_MAX_SECONDS)} seconds"
@@ -217,7 +224,10 @@ def _lottery_help_embed() -> discord.Embed:
             f"{TICKET_EMOJI} **View your tickets**\n"
             "`/lt tickets` or `!lt tickets`\n\n"
             f"{TICKET_EMOJI} **View current draw info**\n"
-            "`/lt info` or `!lt info`"
+            "`/lt info` or `!lt info`\n\n"
+            f"{TICKET_EMOJI} **Set announcement channel**\n"
+            "`/lt set <channel>`\n"
+            "`!lt set #channel`"
         ),
         inline=False,
     )
@@ -265,13 +275,13 @@ def _sicbo_help_embed() -> discord.Embed:
         name="Commands",
         value=(
             "**Place a bet**\n"
-            "`/sb <big|small> <amount>`\n"
-            "`!sb <tai|xiu> <amount>`\n\n"
+            "`/sb bet <big|small> <amount>`\n"
+            "`!sb bet <tai|xiu> <amount>`\n\n"
             "**View current round**\n"
-            "`/sb-info` or `!sb info`\n\n"
+            "`/sb info` or `!sb info`\n\n"
             "**Set round channel**\n"
-            "`/sb-set-channel <channel>`\n"
-            "`!sb set-channel #channel`"
+            "`/sb set <channel>`\n"
+            "`!sb set #channel`"
         ),
         inline=False,
     )

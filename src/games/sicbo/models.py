@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from src.services.progression_service import ProgressionUpdate
+
 
 @dataclass(slots=True)
 class SicboState:
@@ -60,3 +62,4 @@ class SicboResolveResult:
     dice: tuple[int, int, int]
     total: int
     total_payout: int
+    progressions: dict[str, ProgressionUpdate]

@@ -1,21 +1,15 @@
 from __future__ import annotations
 
-import random
-
 import discord
 
 from src.config.emojis import BLACKJACK_CARD_EMOJIS, LOADING_ICON_URL, RESULT_DRAW_ICON_URL, RESULT_LOSE_ICON_URL, RESULT_WIN_ICON_URL
+from src.core.constants import RESULT_BLACKJACK, RESULT_LOSE, RESULT_WIN
 from src.games.blackjack.deck import cards_to_emojis, cards_to_symbols, card_to_emoji, card_to_symbol
 from src.games.blackjack.models import BlackjackActionResult, BlackjackGame
+from src.utils.footer import random_footer_text
 from src.utils.money import format_coin
 
 ZERO_WIDTH = "\u200b"
-FOOTER_MESSAGES = (
-    "Good luck at the table.",
-    "Trust your hand.",
-    "Dealer is watching.",
-    "Play smart, win big.",
-)
 
 
 def render_blackjack_embed(
@@ -49,7 +43,7 @@ def render_blackjack_embed(
     )
     embed.add_field(name=ZERO_WIDTH, value=f"{player_symbol_line}\n{dealer_symbol_line}", inline=True)
 
-    footer = footer_text or _footer_message()
+    footer = footer_text or random_footer_text()
     footer_icon_url = _footer_icon_url(finished, result)
     embed.set_footer(text=footer, icon_url=footer_icon_url)
     return embed
@@ -80,9 +74,9 @@ def _hidden_dealer_lines(game: BlackjackGame) -> tuple[str, str]:
 def _embed_color(finished: bool, result: str | None) -> discord.Color:
     if not finished:
         return discord.Color.blue()
-    if result in {"win", "blackjack"}:
+    if result in {RESULT_WIN, RESULT_BLACKJACK}:
         return discord.Color.green()
-    if result == "lose":
+    if result == RESULT_LOSE:
         return discord.Color.red()
     return discord.Color.yellow()
 
@@ -90,24 +84,20 @@ def _embed_color(finished: bool, result: str | None) -> discord.Color:
 def _format_result_line(finished: bool, result: str | None, net: int) -> str:
     if not finished or result is None:
         return "Playing..."
-    if result == "blackjack":
+    if result == RESULT_BLACKJACK:
         return f"Blackjack +{format_coin(net)}"
-    if result == "win":
+    if result == RESULT_WIN:
         return f"Won +{format_coin(net)}"
-    if result == "lose":
+    if result == RESULT_LOSE:
         return f"Lost {format_coin(net)}"
     return f"Push +{format_coin(0)}"
-
-
-def _footer_message() -> str:
-    return random.choice(FOOTER_MESSAGES)
 
 
 def _footer_icon_url(finished: bool, result: str | None) -> str | None:
     if not finished or result is None:
         return LOADING_ICON_URL
-    if result in {"win", "blackjack"}:
+    if result in {RESULT_WIN, RESULT_BLACKJACK}:
         return RESULT_WIN_ICON_URL
-    if result == "lose":
+    if result == RESULT_LOSE:
         return RESULT_LOSE_ICON_URL
     return RESULT_DRAW_ICON_URL
