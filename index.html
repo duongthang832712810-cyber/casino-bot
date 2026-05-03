@@ -1,0 +1,1093 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LuckyBot+ — Discord Casino & Economy Bot</title>
+<meta name="description" content="LuckyBot+ is a Discord casino and economy bot for virtual coins, Blackjack, Coin Flip, Lottery, Sicbo, profiles, and interactive game embeds.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet">
+<style>
+
+/* ============================================================
+   AXIS INDUSTRIAL — BASE SYSTEM
+   ============================================================ */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --base:        #FFFFFF;
+  --ink:         #000000;
+  --safety:      #FF3E00;
+  --muted:       #888888;
+  --surface:     #F5F5F0;
+  --term-bg:     #08080A;
+  --term-green:  #00FF66;
+  --term-amber:  #FFAA00;
+
+  --border:      4px solid var(--ink);
+  --border-thin: 1px solid var(--ink);
+  --shadow:      8px 8px 0px var(--ink);
+  --shadow-safety: 8px 8px 0px var(--safety);
+
+  --fs-hero:     clamp(4.5rem, 15vw, 15rem);
+  --fs-h1:       clamp(2.4rem, 5vw, 5rem);
+  --fs-h2:       clamp(1.5rem, 3vw, 3rem);
+  --fs-h3:       clamp(1rem, 1.6vw, 1.5rem);
+  --fs-body:     clamp(0.85rem, 1vw, 1rem);
+  --fs-data:     clamp(0.75rem, 0.9vw, 0.92rem);
+  --fs-micro:    0.6rem;
+  --fs-ticker:   clamp(1.4rem, 2.5vw, 2.5rem);
+  --fs-spec-val: clamp(2rem, 4vw, 3.5rem);
+
+  --gap:          clamp(1rem, 2vw, 2rem);
+  --section-pad:  clamp(4rem, 10vw, 10rem) clamp(1rem, 4vw, 4rem);
+  --header-h:     44px;
+}
+
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+body {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 400;
+  font-size: var(--fs-body);
+  line-height: 1.6;
+  color: var(--ink);
+  background: var(--base);
+  overflow-x: hidden;
+}
+img { max-width: 100%; display: block; }
+a { color: inherit; text-decoration: none; }
+ul { list-style: none; }
+::selection { background: var(--safety); color: var(--base); }
+
+h1, h2, h3, h4, h5, h6, .font-display {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  line-height: 0.85;
+  letter-spacing: -0.03em;
+}
+
+/* ============================================================
+   UTILITIES
+   ============================================================ */
+.container { width: 100%; max-width: 1440px; margin: 0 auto; padding-inline: clamp(1rem, 4vw, 4rem); }
+.accent { color: var(--safety); }
+
+.tag {
+  display: inline-block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem; font-weight: 500;
+  text-transform: uppercase; letter-spacing: 0.15em;
+  padding: 0.3em 0.7em;
+  border: 2px solid var(--ink);
+  background: var(--base);
+}
+.tag--filled  { background: var(--ink); color: var(--base); }
+.tag--safety  { background: var(--safety); color: var(--base); border-color: var(--safety); }
+.tag--ghost   { border-color: var(--muted); color: var(--muted); background: transparent; }
+
+.btn {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem; font-weight: 500;
+  text-transform: uppercase; letter-spacing: 0.1em;
+  padding: 0.8em 2em;
+  border: var(--border);
+  cursor: pointer; transition: none;
+  display: inline-block; text-align: center;
+}
+.btn--primary { background: var(--safety); color: var(--base); box-shadow: var(--shadow); }
+.btn--primary:hover { transform: translate(-4px,-4px); box-shadow: 12px 12px 0px var(--ink); }
+.btn--primary:active { transform: translate(4px,4px); box-shadow: none; }
+.btn--ghost { background: var(--base); color: var(--ink); box-shadow: var(--shadow); }
+.btn--ghost:hover { background: var(--ink); color: var(--base); transform: translate(-4px,-4px); box-shadow: 12px 12px 0px var(--ink); }
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+.header {
+  position: fixed; top: 0; left: 0;
+  width: 100%; height: var(--header-h);
+  z-index: 1000;
+  background: var(--ink); color: var(--base);
+  border-bottom: 2px solid var(--safety);
+  display: flex; align-items: center;
+  padding: 0 clamp(1rem, 3vw, 3rem);
+}
+.header__inner {
+  width: 100%; max-width: 1440px; margin: 0 auto;
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+}
+.header__left { display: flex; align-items: center; gap: 1.2rem; }
+.header__logo {
+  font-family: 'Space Grotesk', sans-serif; font-weight: 700;
+  font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em;
+  display: flex; align-items: center; gap: 0.5rem; white-space: nowrap;
+}
+.header__logo-mark {
+  width: 22px; height: 22px; border: 2px solid var(--safety);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.header__logo-mark svg { width: 12px; height: 12px; }
+.header__sep { width: 1px; height: 16px; background: rgba(255,255,255,0.12); }
+.header__product { font-size: var(--fs-micro); letter-spacing: 0.14em; text-transform: uppercase; opacity: 0.4; }
+
+.header__nav {
+  display: flex; align-items: stretch; height: var(--header-h);
+  border-left: 1px solid rgba(255,255,255,0.10);
+}
+.header__nav a {
+  font-family: 'JetBrains Mono', monospace; font-size: var(--fs-micro);
+  text-transform: uppercase; letter-spacing: 0.12em;
+  padding: 0 1.2rem; display: flex; align-items: center;
+  border-right: 1px solid rgba(255,255,255,0.10);
+  color: rgba(255,255,255,0.5); transition: none;
+}
+.header__nav a:hover { background: var(--safety); color: var(--base); }
+.header__nav a.active { background: rgba(255,255,255,0.06); color: var(--base); }
+
+.header__right { display: flex; align-items: center; gap: 1.2rem; }
+.header__status { display: flex; align-items: center; gap: 0.4rem; font-size: var(--fs-micro); text-transform: uppercase; letter-spacing: 0.12em; }
+.header__status-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--term-green); animation: pulse 2s ease-in-out infinite; }
+.header__clock { font-family: 'JetBrains Mono', monospace; font-size: var(--fs-micro); font-weight: 500; letter-spacing: 0.08em; opacity: 0.7; min-width: 7em; text-align: right; }
+.header__burger { display: none; flex-direction: column; gap: 4px; cursor: pointer; background: none; border: none; padding: 4px; }
+.header__burger span { width: 22px; height: 2px; background: var(--base); }
+
+@keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
+
+/* ============================================================
+   HERO
+   ============================================================ */
+.hero {
+  min-height: 100vh; min-height: 100svh;
+  display: flex; flex-direction: column;
+  justify-content: flex-end;
+  padding: var(--section-pad);
+  padding-top: calc(var(--header-h) + 4rem);
+  position: relative; overflow: hidden;
+  border-bottom: var(--border);
+  background: var(--ink); color: var(--base);
+}
+
+.hero__grid {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+  background-size: 48px 48px;
+  pointer-events: none;
+}
+
+/* Floating card suit decorations */
+.hero__suits {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.hero__suit {
+  position: absolute;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  color: var(--base);
+  line-height: 1;
+  animation: floatSuit linear infinite;
+  opacity: 0;
+}
+.hero__suit:nth-child(1) { top: 15%; right: 8%;  font-size: 5rem;  animation-duration: 18s; animation-delay: 0s;    opacity: 0.04; }
+.hero__suit:nth-child(2) { top: 40%; right: 22%; font-size: 2.5rem; animation-duration: 22s; animation-delay: -4s;  opacity: 0.05; }
+.hero__suit:nth-child(3) { top: 65%; right: 5%;  font-size: 3.5rem; animation-duration: 25s; animation-delay: -9s;  opacity: 0.04; }
+.hero__suit:nth-child(4) { top: 25%; right: 38%; font-size: 1.8rem; animation-duration: 20s; animation-delay: -12s; opacity: 0.03; }
+.hero__suit:nth-child(5) { top: 55%; right: 50%; font-size: 7rem;  animation-duration: 30s; animation-delay: -6s;   opacity: 0.025; }
+.hero__suit:nth-child(6) { top: 80%; right: 30%; font-size: 2rem;  animation-duration: 16s; animation-delay: -2s;   opacity: 0.05; }
+
+@keyframes floatSuit {
+  0%   { transform: translateY(0) rotate(0deg);   }
+  50%  { transform: translateY(-20px) rotate(8deg); }
+  100% { transform: translateY(0) rotate(0deg);   }
+}
+
+.hero__label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--fs-micro);
+  text-transform: uppercase; letter-spacing: 0.25em;
+  color: rgba(255,255,255,0.35);
+  margin-bottom: 1.5rem;
+  position: relative; z-index: 1;
+}
+
+.hero__title {
+  font-size: var(--fs-hero);
+  line-height: 0.82;
+  letter-spacing: -0.05em;
+  position: relative; z-index: 1;
+  margin-bottom: 0;
+}
+.hero__title .line { display: block; }
+.hero__title .line--indent { padding-left: clamp(2rem, 8vw, 9rem); }
+.accent-dot { color: var(--safety); }
+
+.hero__bottom {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 2rem;
+  margin-top: 3rem;
+  padding-top: 2.5rem;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  position: relative; z-index: 1;
+  flex-wrap: wrap;
+}
+
+.hero__desc {
+  font-size: var(--fs-body);
+  line-height: 1.8;
+  color: rgba(255,255,255,0.5);
+  max-width: 420px;
+}
+
+.hero__stats {
+  display: flex;
+  gap: clamp(2rem, 4vw, 4rem);
+  flex-shrink: 0;
+}
+.hero__stat-num {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+.hero__stat-num .accent { color: var(--safety); }
+.hero__stat-label {
+  font-size: var(--fs-micro);
+  text-transform: uppercase; letter-spacing: 0.2em;
+  color: rgba(255,255,255,0.3);
+  margin-top: 0.5rem;
+}
+
+.hero__scroll-cue {
+  position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%);
+  font-size: var(--fs-micro); text-transform: uppercase; letter-spacing: 0.25em;
+  color: rgba(255,255,255,0.2);
+}
+
+/* ============================================================
+   SECTIONS SHARED
+   ============================================================ */
+.section {
+  padding: var(--section-pad);
+  border-bottom: var(--border);
+}
+.section--surface { background: var(--surface); }
+.section--dark { background: var(--ink); color: var(--base); }
+
+.section__header { margin-bottom: clamp(3rem, 6vw, 6rem); }
+.section__eyebrow {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--fs-micro); text-transform: uppercase; letter-spacing: 0.25em;
+  color: var(--safety); margin-bottom: 1rem;
+}
+.section__title { font-size: var(--fs-h1); }
+
+/* ============================================================
+   BENTO GRID — GAMES
+   ============================================================ */
+.bento__grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  grid-auto-rows: minmax(180px, auto);
+  gap: var(--gap);
+}
+.bento-card--wide   { grid-column: span 8; }
+.bento-card--mid    { grid-column: span 6; }
+.bento-card--narrow { grid-column: span 4; }
+.bento-card--tall   { grid-row: span 2; }
+
+.bento-card {
+  border: var(--border);
+  box-shadow: var(--shadow);
+  padding: clamp(1.5rem, 2.5vw, 2.5rem);
+  background: var(--base);
+  display: flex; flex-direction: column; justify-content: space-between;
+  position: relative; overflow: hidden;
+  transition: none; cursor: default;
+}
+.bento-card:hover { transform: translate(-4px,-4px); box-shadow: 12px 12px 0px var(--ink); }
+.bento-card--dark { background: var(--ink); color: var(--base); box-shadow: var(--shadow-safety); }
+.bento-card--dark:hover { box-shadow: 12px 12px 0px var(--safety); }
+.bento-card--safety { background: var(--safety); color: var(--base); }
+.bento-card--safety:hover { background: var(--ink); box-shadow: 12px 12px 0px var(--safety); }
+
+.bento-card__number {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--fs-micro); text-transform: uppercase; letter-spacing: 0.2em; opacity: 0.3; margin-bottom: 1rem;
+}
+.bento-card__title { font-size: var(--fs-h3); margin-bottom: 0.6rem; line-height: 0.9; }
+.bento-card__text  { font-size: var(--fs-data); line-height: 1.7; opacity: 0.55; }
+.bento-card__stat {
+  font-family: 'Space Grotesk', sans-serif; font-weight: 700;
+  font-size: clamp(2.5rem, 5vw, 4rem); line-height: 1; letter-spacing: -0.04em;
+  align-self: end;
+}
+.bento-card__icon {
+  font-size: clamp(3rem, 6vw, 5.5rem);
+  line-height: 1;
+  margin-bottom: 0.5rem;
+  opacity: 0.8;
+}
+
+/* decorative circle */
+.bento-card__visual {
+  position: absolute; right: -10px; bottom: -10px;
+  width: 120px; height: 120px;
+  border: 3px solid currentColor; border-radius: 50%;
+  opacity: 0.07;
+}
+
+/* bar chart */
+.bar-chart {
+  display: flex; align-items: flex-end; gap: 4px;
+  height: 60px; margin-top: 1rem;
+}
+.bar-chart__col { flex: 1; background: var(--safety); min-height: 4px; border: 2px solid var(--ink); }
+.bento-card--dark .bar-chart__col { border-color: var(--safety); }
+
+/* bar track */
+.bar-track { width: 100%; height: 4px; background: rgba(0,0,0,0.08); margin-top: 0.8rem; overflow: hidden; }
+.bar-track__fill { height: 100%; background: var(--safety); }
+.bento-card--dark .bar-track { background: rgba(255,255,255,0.12); }
+
+/* ============================================================
+   TICKER
+   ============================================================ */
+.ticker { border-bottom: var(--border); background: var(--ink); color: var(--base); overflow: hidden; padding: 1.2rem 0; }
+.ticker--safety { background: var(--safety); }
+.ticker--safety .ticker__item::after { background: var(--base); }
+
+.ticker__track { display: flex; width: max-content; animation: tickerScroll 22s linear infinite; }
+.ticker--reverse .ticker__track { animation-direction: reverse; animation-duration: 30s; }
+
+.ticker__item {
+  font-family: 'Space Grotesk', sans-serif; font-weight: 700;
+  font-size: var(--fs-ticker); text-transform: uppercase; letter-spacing: -0.02em;
+  white-space: nowrap; padding: 0 2rem;
+  display: flex; align-items: center; gap: 2rem;
+}
+.ticker__item::after { content: ''; width: 12px; height: 12px; background: var(--safety); flex-shrink: 0; }
+
+@keyframes tickerScroll { 0%{transform:translateX(0);} 100%{transform:translateX(-50%);} }
+
+/* ============================================================
+   LIVE STATS RIBBON
+   ============================================================ */
+.ribbon {
+  display: grid; grid-template-columns: repeat(5, 1fr);
+  border-bottom: var(--border);
+  background: var(--base);
+}
+.ribbon__cell {
+  padding: clamp(1rem, 1.8vw, 1.8rem) clamp(1rem, 1.5vw, 1.5rem);
+  border-right: var(--border-thin);
+  transition: none; cursor: default;
+}
+.ribbon__cell:last-child { border-right: none; }
+.ribbon__cell:hover { background: var(--ink); color: var(--base); }
+.ribbon__cell:nth-child(3) { background: var(--ink); color: var(--base); }
+.ribbon__cell:nth-child(3):hover { background: var(--safety); }
+
+.ribbon__label { font-size: var(--fs-micro); text-transform: uppercase; letter-spacing: 0.16em; opacity: 0.4; margin-bottom: 0.5rem; }
+.ribbon__value { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: clamp(1.4rem, 2.5vw, 2.2rem); line-height: 1; letter-spacing: -0.03em; }
+.ribbon__unit  { font-family: 'JetBrains Mono', monospace; font-size: 0.45em; font-weight: 400; opacity: 0.45; margin-left: 0.1em; }
+.ribbon__cell .bar-track { margin-top: 0.8rem; height: 3px; }
+.ribbon__cell:nth-child(3) .bar-track,
+.ribbon__cell:hover       .bar-track { background: rgba(255,255,255,0.12); }
+
+/* ============================================================
+   STACK CARDS — HOW IT WORKS
+   ============================================================ */
+.stack__header {
+  margin-bottom: clamp(3rem, 6vw, 6rem);
+  display: flex; align-items: flex-end; justify-content: space-between; gap: 2rem; flex-wrap: wrap;
+}
+.stack__subtitle { font-size: var(--fs-data); max-width: 340px; opacity: 0.6; line-height: 1.7; }
+
+.stack__card {
+  position: sticky; top: 80px;
+  border: var(--border); box-shadow: var(--shadow);
+  background: var(--base);
+  padding: clamp(2rem, 4vw, 4rem);
+  margin-bottom: 2rem;
+  display: grid; grid-template-columns: repeat(12, 1fr); gap: var(--gap); align-items: center;
+  transition: none;
+}
+.stack__card:nth-child(2) { top: 110px; background: #F5F5F0; }
+.stack__card:nth-child(3) { top: 140px; background: var(--ink); color: var(--base); box-shadow: var(--shadow-safety); }
+.stack__card:nth-child(4) { top: 170px; background: #F0F0EB; }
+.stack__card:nth-child(5) { top: 200px; background: var(--safety); color: var(--base); }
+
+.stack__card:hover { transform: translate(-4px,-4px); box-shadow: 12px 12px 0px var(--ink); }
+.stack__card:nth-child(3):hover { box-shadow: 12px 12px 0px var(--safety); }
+.stack__card:nth-child(5):hover { box-shadow: 12px 12px 0px var(--ink); }
+
+.stack__card-left  { grid-column: span 4; }
+.stack__card-right { grid-column: span 8; }
+
+.stack__card-step {
+  font-family: 'Space Grotesk', sans-serif; font-weight: 700;
+  font-size: clamp(4rem, 8vw, 7rem); line-height: 0.8; letter-spacing: -0.05em; opacity: 0.12;
+}
+.stack__card-title { font-size: var(--fs-h2); margin-bottom: 1rem; }
+.stack__card-text  { font-size: var(--fs-data); line-height: 1.8; opacity: 0.7; max-width: 520px; }
+.stack__card-tags  { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.2rem; }
+
+.stack__card:nth-child(3) .tag { border-color: var(--base); color: var(--base); background: transparent; }
+.stack__card:nth-child(3) .tag--filled { background: var(--safety); border-color: var(--safety); }
+.stack__card:nth-child(5) .tag { border-color: rgba(0,0,0,0.4); color: var(--base); background: transparent; }
+.stack__card:nth-child(5) .tag--filled { background: var(--base); border-color: var(--base); color: var(--safety); }
+
+/* ============================================================
+   TERMINAL PREVIEW
+   ============================================================ */
+.terminal {
+  background: var(--term-bg);
+  border: var(--border);
+  box-shadow: var(--shadow-safety);
+  border-color: var(--safety);
+  overflow: hidden;
+}
+.terminal__bar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.terminal__bar-left { display: flex; align-items: center; gap: 0.5rem; }
+.terminal__dot { width: 8px; height: 8px; border-radius: 50%; }
+.terminal__dot--red    { background: #FF5F57; }
+.terminal__dot--yellow { background: #FFBD2E; }
+.terminal__dot--green  { background: #28CA41; }
+.terminal__bar-title { font-size: var(--fs-micro); color: rgba(255,255,255,0.25); text-transform: uppercase; letter-spacing: 0.15em; margin-left: 0.6rem; }
+.terminal__bar-status { font-size: 0.5rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--term-green); display: flex; align-items: center; gap: 0.4rem; }
+.terminal__bar-status::before { content:''; width:5px; height:5px; border-radius:50%; background:var(--term-green); animation: pulse 2s ease-in-out infinite; }
+
+.terminal__body { padding: 1.2rem 1.5rem; max-height: 280px; overflow: hidden; position: relative; }
+.terminal__body::after { content:''; position:absolute; bottom:0; left:0; right:0; height:60px; background:linear-gradient(transparent, var(--term-bg)); pointer-events:none; }
+
+.terminal__line {
+  display: flex; gap: 0.8rem; align-items: baseline;
+  font-size: 0.65rem; line-height: 1.9;
+  color: rgba(255,255,255,0.4);
+}
+.terminal__prompt { color: var(--safety); flex-shrink: 0; }
+.terminal__cmd    { color: rgba(255,255,255,0.8); }
+.terminal__out    { color: var(--term-green); }
+.terminal__warn   { color: var(--term-amber); }
+.terminal__dim    { color: rgba(255,255,255,0.2); }
+
+/* ============================================================
+   CTA BAND
+   ============================================================ */
+.cta-band {
+  padding: clamp(4rem, 8vw, 8rem) clamp(1rem, 4vw, 4rem);
+  text-align: center;
+  border-bottom: var(--border);
+}
+.cta-band__inner { max-width: 700px; margin: 0 auto; }
+.cta-band__title { font-size: var(--fs-h1); margin-bottom: 1.5rem; }
+.cta-band__text  { font-size: var(--fs-data); line-height: 1.9; opacity: 0.5; margin-bottom: 2.5rem; }
+.cta-band__actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+
+/* ============================================================
+   ABOUT
+   ============================================================ */
+.about { padding: clamp(2.5rem, 5vw, 4rem) clamp(1rem, 4vw, 4rem); border-bottom: var(--border); background: var(--surface); }
+.about__inner { max-width: 760px; margin: 0 auto; text-align: center; }
+.about__text   { font-size: var(--fs-data); line-height: 2; opacity: 0.6; margin-bottom: 1.5rem; }
+.about__links  { display: flex; gap: 0.6rem; justify-content: center; flex-wrap: wrap; }
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+.footer { background: var(--ink); color: var(--base); padding: clamp(2.5rem, 5vw, 4rem) clamp(1rem, 4vw, 4rem); }
+.footer__inner { max-width: 1440px; margin: 0 auto; }
+
+.footer__top {
+  display: grid; grid-template-columns: repeat(12, 1fr);
+  gap: var(--gap);
+  padding-bottom: clamp(3rem, 6vw, 6rem);
+  border-bottom: 1px solid rgba(255,255,255,0.12);
+}
+.footer__brand { grid-column: span 5; }
+.footer__brand-name { font-size: var(--fs-h2); margin-bottom: 1.5rem; }
+.footer__brand-desc { font-size: var(--fs-data); opacity: 0.45; line-height: 1.8; max-width: 340px; }
+
+.footer__col { grid-column: span 2; }
+.footer__col:last-child { grid-column: span 3; }
+.footer__col-title {
+  font-family: 'JetBrains Mono', monospace; font-size: 0.65rem;
+  text-transform: uppercase; letter-spacing: 0.18em; color: var(--safety);
+  margin-bottom: 1.5rem; font-weight: 500;
+}
+.footer__col a { display: block; font-size: var(--fs-data); opacity: 0.5; margin-bottom: 0.75rem; }
+.footer__col a:hover { opacity: 1; color: var(--safety); }
+
+.footer__bottom {
+  display: flex; justify-content: space-between; align-items: center;
+  padding-top: 2rem; gap: 1rem; flex-wrap: wrap;
+}
+.footer__copy { font-size: 0.65rem; color: rgba(255,255,255,0.35); letter-spacing: 0.05em; }
+.footer__copy a { color: var(--safety); }
+.footer__back-top {
+  font-family: 'JetBrains Mono', monospace; font-size: 0.65rem;
+  text-transform: uppercase; letter-spacing: 0.15em; opacity: 0.4;
+  cursor: pointer; background: none; border: none; color: var(--base);
+}
+.footer__back-top:hover { opacity: 1; color: var(--safety); }
+
+/* ============================================================
+   SCROLL REVEAL
+   ============================================================ */
+.reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.5s ease, transform 0.5s ease; }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 1024px) {
+  .bento-card--wide, .bento-card--mid, .bento-card--narrow { grid-column: span 6; }
+  .ribbon { grid-template-columns: repeat(3, 1fr); }
+  .ribbon__cell:nth-child(3) { border-right: none; }
+  .footer__brand { grid-column: span 12; margin-bottom: 2rem; }
+  .footer__col { grid-column: span 4; }
+  .footer__col:last-child { grid-column: span 4; }
+}
+
+@media (max-width: 768px) {
+  .header__nav { display: none; }
+  .header__product { display: none; }
+  .header__burger { display: flex; }
+  .header__nav.open {
+    display: flex; flex-direction: column;
+    position: absolute; top: var(--header-h); left: 0; width: 100%;
+    background: var(--ink); border-bottom: 2px solid var(--safety); overflow-y: auto;
+  }
+  .header__nav.open a {
+    border-right: none; border-bottom: 1px solid rgba(255,255,255,0.06);
+    padding: 0.9rem clamp(1rem, 3vw, 3rem); height: auto;
+  }
+  .bento-card--wide, .bento-card--mid, .bento-card--narrow { grid-column: 1/-1; }
+  .bento-card--tall { grid-row: span 1; }
+  .ribbon { grid-template-columns: repeat(2, 1fr); }
+  .ribbon__cell { border-bottom: var(--border-thin); }
+  .hero__bottom { flex-direction: column; align-items: flex-start; }
+  .hero__scroll-cue { display: none; }
+  .stack__card { grid-template-columns: 1fr; position: relative; top: auto !important; }
+  .stack__card-left, .stack__card-right { grid-column: 1/-1; }
+  .stack__card-step { font-size: 4rem; }
+  .footer__col { grid-column: span 6; }
+  .footer__col:last-child { grid-column: span 6; }
+}
+
+@media (max-width: 480px) {
+  .hero__stats { flex-direction: column; gap: 1rem; }
+  .ribbon { grid-template-columns: 1fr; }
+  .footer__col, .footer__col:last-child { grid-column: 1/-1; }
+  .header__status span { display: none; }
+  .cta-band__actions { flex-direction: column; }
+  .btn { width: 100%; }
+}
+</style>
+</head>
+<body>
+
+<!-- ====== HEADER ====== -->
+<header class="header">
+  <div class="header__inner">
+    <div class="header__left">
+      <a href="index.html" class="header__logo" aria-label="LuckyBot+ Home">
+        <span class="header__logo-mark">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2L2 7V17L12 22L22 17V7L12 2Z" stroke="#FF3E00" stroke-width="2.5"/><line x1="12" y1="2" x2="12" y2="22" stroke="#FF3E00" stroke-width="2"/></svg>
+        </span>
+        LuckyBot+
+      </a>
+      <span class="header__sep"></span>
+      <span class="header__product">Discord Casino / v1.0</span>
+    </div>
+        <nav class="header__nav" id="headerNav">
+      <a href="index.html" class="active">Home</a>
+      <a href="tos.html">Terms</a>
+      <a href="privacy.html">Privacy</a>
+    </nav>
+    <div class="header__right">
+      <div class="header__status"><span class="header__status-dot"></span><span>Bot Online</span></div>
+      <div class="header__clock" id="utcClock">--:--:-- UTC</div>
+    </div>
+    <button class="header__burger" id="headerBurger" aria-label="Toggle navigation" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+
+<!-- ====== HERO ====== -->
+<section class="hero">
+  <div class="hero__grid" aria-hidden="true"></div>
+  <div class="hero__suits" aria-hidden="true">
+    <span class="hero__suit">♠</span>
+    <span class="hero__suit">♦</span>
+    <span class="hero__suit">♣</span>
+    <span class="hero__suit">♥</span>
+    <span class="hero__suit">🎲</span>
+    <span class="hero__suit">🃏</span>
+  </div>
+
+  <div class="hero__label reveal">LuckyBot+ — Virtual Casino Economy Platform</div>
+  <h1 class="hero__title">
+    <span class="line">Roll</span>
+    <span class="line line--indent">the House<span class="accent-dot">.</span></span>
+  </h1>
+  <div class="hero__bottom">
+    <p class="hero__desc reveal">Blackjack, Coin Flip, Lottery, Sicbo — a full virtual casino on your Discord server. Virtual coins, profiles, EXP, clean embeds, and zero real money.</p>
+    <div class="hero__stats reveal">
+      <div>
+        <div class="hero__stat-num">4<span class="accent">+</span></div>
+        <div class="hero__stat-label">Casino Games</div>
+      </div>
+      <div>
+        <div class="hero__stat-num">100<span class="accent">%</span></div>
+        <div class="hero__stat-label">Virtual Economy</div>
+      </div>
+      <div>
+        <div class="hero__stat-num">∞</div>
+        <div class="hero__stat-label">Servers Supported</div>
+      </div>
+    </div>
+  </div>
+  <div class="hero__scroll-cue" aria-hidden="true">Scroll</div>
+</section>
+
+
+<!-- ====== LIVE RIBBON ====== -->
+<section class="ribbon reveal" aria-label="Live stats">
+  <div class="ribbon__cell">
+    <div class="ribbon__label">Bot Status</div>
+    <div class="ribbon__value">Online</div>
+    <div class="bar-track"><div class="bar-track__fill" style="width:100%"></div></div>
+  </div>
+  <div class="ribbon__cell">
+    <div class="ribbon__label">Games Available</div>
+    <div class="ribbon__value">4<span class="ribbon__unit">modes</span></div>
+    <div class="bar-track"><div class="bar-track__fill" style="width:100%"></div></div>
+  </div>
+  <div class="ribbon__cell">
+    <div class="ribbon__label">Real Money</div>
+    <div class="ribbon__value">ZERO</div>
+    <div class="bar-track"><div class="bar-track__fill" style="width:0%"></div></div>
+  </div>
+  <div class="ribbon__cell">
+    <div class="ribbon__label">Setup Time</div>
+    <div class="ribbon__value">&lt;5<span class="ribbon__unit">min</span></div>
+    <div class="bar-track"><div class="bar-track__fill" style="width:92%"></div></div>
+  </div>
+  <div class="ribbon__cell">
+    <div class="ribbon__label">Commands</div>
+    <div class="ribbon__value">/<span class="ribbon__unit">slash</span></div>
+    <div class="bar-track"><div class="bar-track__fill" style="width:100%"></div></div>
+  </div>
+</section>
+
+
+<!-- ====== BENTO GAMES ====== -->
+<section class="section" id="games">
+  <div class="container">
+    <div class="section__header reveal">
+      <div class="section__eyebrow">// Game Catalog</div>
+      <h2 class="section__title">What's on<br>the Floor</h2>
+    </div>
+
+    <div class="bento__grid">
+
+      <!-- Blackjack — wide -->
+      <div class="bento-card bento-card--wide reveal">
+        <div class="bento-card__number">GC—01</div>
+        <div>
+          <div class="bento-card__icon">🃏</div>
+          <h3 class="bento-card__title">Blackjack</h3>
+          <p class="bento-card__text">Classic 21. Hit, stand, double — beat the dealer. Persistent game state survives bot restarts. Discord button controls, full embed UI.</p>
+        </div>
+        <div style="align-self:end; display:flex; flex-wrap:wrap; gap:0.5rem; margin-top:1rem;">
+          <span class="tag tag--filled">Hit / Stand</span>
+          <span class="tag">Double Down</span>
+          <span class="tag tag--safety">Live Embed</span>
+        </div>
+        <div class="bento-card__visual" aria-hidden="true"></div>
+      </div>
+
+      <!-- Coin Flip — narrow dark -->
+      <div class="bento-card bento-card--narrow bento-card--dark reveal">
+        <div class="bento-card__number">GC—02</div>
+        <div>
+          <div class="bento-card__icon">🪙</div>
+          <h3 class="bento-card__title">Coin<br>Flip</h3>
+          <p class="bento-card__text">Heads or tails. Instant resolution. Max bet enforced.</p>
+        </div>
+        <div class="bento-card__stat">50<span style="font-size:0.35em; opacity:0.5">%</span></div>
+      </div>
+
+      <!-- Economy -->
+      <div class="bento-card bento-card--mid reveal">
+        <div class="bento-card__number">GC—03</div>
+        <div>
+          <div class="bento-card__icon">💰</div>
+          <h3 class="bento-card__title">Virtual<br>Economy</h3>
+          <p class="bento-card__text">Per-server coin balances. XP leveling. Daily bonuses. Full leaderboard. Profile stats with W/L/D tracking.</p>
+        </div>
+        <div style="align-self:end; display:flex; flex-wrap:wrap; gap:0.5rem; margin-top:1rem;">
+          <span class="tag">Coins</span>
+          <span class="tag tag--filled">XP</span>
+          <span class="tag">Leaderboard</span>
+        </div>
+      </div>
+
+      <!-- Lottery -->
+      <div class="bento-card bento-card--mid bento-card--safety reveal">
+        <div class="bento-card__number">GC—04</div>
+        <div>
+          <div class="bento-card__icon">🎟️</div>
+          <h3 class="bento-card__title">Lottery</h3>
+          <p class="bento-card__text">Buy tickets, wait for the draw. Jackpot announced in your configured channel. Tickets cleared each cycle.</p>
+        </div>
+        <div class="bento-card__stat">JACKPOT</div>
+      </div>
+
+      <!-- Sicbo — narrow tall -->
+      <div class="bento-card bento-card--narrow bento-card--tall reveal">
+        <div class="bento-card__number">GC—05</div>
+        <div>
+          <div class="bento-card__icon">🎲</div>
+          <h3 class="bento-card__title">Sicbo</h3>
+          <p class="bento-card__text">Three-dice wagering. Place bets on combinations, totals, and specific outcomes. Fast-paced rounds with live embed results.</p>
+        </div>
+        <div style="align-self:end;">
+          <div class="bento-card__stat" style="font-size:clamp(1.5rem,3vw,2.5rem)">3 DICE</div>
+          <div class="bento-card__text" style="margin-top:0.5rem;">Multiple bet types</div>
+        </div>
+      </div>
+
+      <!-- Announcements — wide dark -->
+      <div class="bento-card bento-card--wide bento-card--dark reveal">
+        <div class="bento-card__number">GC—06</div>
+        <div>
+          <div style="display:flex; gap:1rem; align-items:flex-start; flex-wrap:wrap;">
+            <div>
+              <h3 class="bento-card__title">Announcement<br>System</h3>
+              <p class="bento-card__text" style="opacity:0.5; margin-top:0.8rem;">Configurable per-server channels for game results, lottery draws, and economy events. Persistent message editing — no spam.</p>
+            </div>
+          </div>
+        </div>
+        <div class="bar-chart">
+          <div class="bar-chart__col" style="height:55%"></div>
+          <div class="bar-chart__col" style="height:80%"></div>
+          <div class="bar-chart__col" style="height:40%"></div>
+          <div class="bar-chart__col" style="height:95%"></div>
+          <div class="bar-chart__col" style="height:65%"></div>
+          <div class="bar-chart__col" style="height:100%"></div>
+          <div class="bar-chart__col" style="height:75%"></div>
+          <div class="bar-chart__col" style="height:50%"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ====== TICKER 1 ====== -->
+<div class="ticker" aria-hidden="true">
+  <div class="ticker__track">
+    <span class="ticker__item">Blackjack</span>
+    <span class="ticker__item">Coin Flip</span>
+    <span class="ticker__item">Lottery</span>
+    <span class="ticker__item">Sicbo</span>
+    <span class="ticker__item">Virtual Economy</span>
+    <span class="ticker__item">XP Leveling</span>
+    <span class="ticker__item">Leaderboard</span>
+    <span class="ticker__item">Daily Bonus</span>
+    <span class="ticker__item">Blackjack</span>
+    <span class="ticker__item">Coin Flip</span>
+    <span class="ticker__item">Lottery</span>
+    <span class="ticker__item">Sicbo</span>
+    <span class="ticker__item">Virtual Economy</span>
+    <span class="ticker__item">XP Leveling</span>
+    <span class="ticker__item">Leaderboard</span>
+    <span class="ticker__item">Daily Bonus</span>
+  </div>
+</div>
+<div class="ticker ticker--reverse ticker--safety" aria-hidden="true">
+  <div class="ticker__track">
+    <span class="ticker__item">No Real Money</span>
+    <span class="ticker__item">Entertainment Only</span>
+    <span class="ticker__item">Virtual Coins</span>
+    <span class="ticker__item">Free to Use</span>
+    <span class="ticker__item">No Real Money</span>
+    <span class="ticker__item">Entertainment Only</span>
+    <span class="ticker__item">Virtual Coins</span>
+    <span class="ticker__item">Free to Use</span>
+    <span class="ticker__item">No Real Money</span>
+    <span class="ticker__item">Entertainment Only</span>
+    <span class="ticker__item">Virtual Coins</span>
+    <span class="ticker__item">Free to Use</span>
+  </div>
+</div>
+
+
+<!-- ====== HOW IT WORKS ====== -->
+<section class="section" id="how">
+  <div class="container">
+    <div class="stack__header reveal">
+      <div>
+        <div class="section__eyebrow">// How It Works</div>
+        <h2 class="section__title">From Invite<br>to All-In</h2>
+      </div>
+      <p class="stack__subtitle">Five steps. One command prefix. Your server's casino is open in minutes.</p>
+    </div>
+
+    <div>
+      <article class="stack__card reveal">
+        <div class="stack__card-left"><div class="stack__card-step">01</div></div>
+        <div class="stack__card-right">
+          <h3 class="stack__card-title">Invite the Bot</h3>
+          <p class="stack__card-text">Click the invite link, select your Discord server, and grant the required permissions. The bot joins your server instantly — no sign-up, no accounts, no email required.</p>
+          <div class="stack__card-tags">
+            <span class="tag">OAuth2</span>
+            <span class="tag tag--filled">Slash Commands</span>
+            <span class="tag">Permissions</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="stack__card reveal">
+        <div class="stack__card-left"><div class="stack__card-step">02</div></div>
+        <div class="stack__card-right">
+          <h3 class="stack__card-title">Configure<br>Your Server</h3>
+                    <p class="stack__card-text">Use admin setup commands to configure Lottery and Sicbo announcement channels. Restrict bot commands to specific channels using Discord's built-in permission system. Takes under two minutes.</p>
+          <div class="stack__card-tags">
+            <span class="tag">/lt set-channel</span>
+            <span class="tag">/sb set-channel</span>
+            <span class="tag tag--safety">Admin Only</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="stack__card reveal">
+        <div class="stack__card-left"><div class="stack__card-step">03</div></div>
+        <div class="stack__card-right">
+          <h3 class="stack__card-title">Earn Your<br>Starting Chips</h3>
+          <p class="stack__card-text">Every new player starts with a default coin balance. Claim daily bonuses to top up. Complete games to earn XP and climb the leaderboard. Your economy is live immediately.</p>
+          <div class="stack__card-tags">
+            <span class="tag tag--filled">Daily Bonus</span>
+            <span class="tag">Starting Balance</span>
+            <span class="tag">XP</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="stack__card reveal">
+        <div class="stack__card-left"><div class="stack__card-step">04</div></div>
+        <div class="stack__card-right">
+          <h3 class="stack__card-title">Play &<br>Wager</h3>
+          <p class="stack__card-text">Start a game with a single slash command. Specify your bet, interact with the Discord button UI, and see results posted in your announcement channel. One active game per user at a time.</p>
+          <div class="stack__card-tags">
+                        <span class="tag">/help</span>
+                        <span class="tag">/bj</span>
+                        <span class="tag">/cf</span>
+                        <span class="tag">/lt</span>
+                        <span class="tag">/sb</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="stack__card reveal">
+        <div class="stack__card-left"><div class="stack__card-step">05</div></div>
+        <div class="stack__card-right">
+          <h3 class="stack__card-title">Track & Compete</h3>
+          <p class="stack__card-text">Check your profile to see wins, losses, draws, total games, and lifetime earnings. View the server leaderboard. Climb the ranks. Brag rights included at no extra charge.</p>
+          <div class="stack__card-tags">
+                        <span class="tag tag--filled">/help</span>
+                        <span class="tag">/bj</span>
+                        <span class="tag">/cf</span>
+                        <span class="tag">/lt</span>
+                        <span class="tag">/sb</span>
+          </div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+
+<!-- ====== TERMINAL PREVIEW ====== -->
+<section class="section section--dark" id="setup">
+  <div class="container">
+    <div class="section__header reveal">
+      <div class="section__eyebrow">// Command Reference</div>
+      <h2 class="section__title">Type Your<br>First Bet</h2>
+    </div>
+
+    <div class="terminal reveal">
+      <div class="terminal__bar">
+        <div class="terminal__bar-left">
+          <div class="terminal__dot terminal__dot--red"></div>
+          <div class="terminal__dot terminal__dot--yellow"></div>
+          <div class="terminal__dot terminal__dot--green"></div>
+          <span class="terminal__bar-title">// LuckyBot+ — Discord Terminal</span>
+        </div>
+        <div class="terminal__bar-status">Bot Connected</div>
+      </div>
+      <div class="terminal__body">
+                <div class="terminal__line"><span class="terminal__prompt">#</span><span class="terminal__cmd">/help</span></div>
+                <div class="terminal__line"><span class="terminal__dim">&gt;</span><span class="terminal__out">View all LuckyBot+ game commands.</span></div>
+                <div class="terminal__line" style="margin-top:0.4rem;"><span class="terminal__prompt">#</span><span class="terminal__cmd">/bj amount:200</span></div>
+                <div class="terminal__line"><span class="terminal__dim">&gt;</span><span class="terminal__out">Blackjack started. Use Hit, Stand, or Double.</span></div>
+                <div class="terminal__line" style="margin-top:0.4rem;"><span class="terminal__prompt">#</span><span class="terminal__cmd">/cf choice:heads amount:500</span></div>
+                <div class="terminal__line"><span class="terminal__dim">&gt;</span><span class="terminal__out">Flipping... result will be posted after a short delay.</span></div>
+                <div class="terminal__line" style="margin-top:0.4rem;"><span class="terminal__prompt">#</span><span class="terminal__cmd">/lt</span></div>
+                <div class="terminal__line"><span class="terminal__dim">&gt;</span><span class="terminal__out">Buy Lottery tickets or check the current draw.</span></div>
+                <div class="terminal__line" style="margin-top:0.4rem;"><span class="terminal__prompt">#</span><span class="terminal__cmd">/sb</span></div>
+                <div class="terminal__line"><span class="terminal__dim">&gt;</span><span class="terminal__out">Place Sicbo bets with virtual coins.</span></div>
+        <div class="terminal__line" style="margin-top:0.4rem;"><span class="terminal__prompt">#</span><span class="terminal__dim">█</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ====== CTA ====== -->
+<section class="cta-band">
+  <div class="cta-band__inner reveal">
+    <h2 class="cta-band__title">Open Your<br>Casino<span class="accent">.</span></h2>
+    <p class="cta-band__text">Free to use. No real money. No registration. Invite LuckyBot+ to your Discord server and the floor is open in under five minutes.</p>
+    <div class="cta-band__actions">
+            <a href="https://discord.com/oauth2/authorize?client_id=1467904752816886037&permissions=414464732224&integration_type=0&scope=bot+applications.commands" class="btn btn--primary">Invite to Discord</a>
+      <a href="https://discord.gg/Bhd4NpNqCh" class="btn btn--ghost">Support Server</a>
+    </div>
+  </div>
+</section>
+
+
+<!-- ====== ABOUT ====== -->
+<section class="about">
+  <div class="about__inner">
+    <p class="about__text">
+      LuckyBot+ is a virtual economy and entertainment bot for Discord. All games use virtual coins with no real-world value. Read our
+      <a href="tos.html" style="color:var(--safety); font-weight:500;">Terms of Service</a> and
+      <a href="privacy.html" style="color:var(--safety); font-weight:500;">Privacy Policy</a>
+      before using the bot.
+    </p>
+    <div class="about__links">
+      <a href="tos.html" class="tag tag--filled">Terms of Service</a>
+      <a href="privacy.html" class="tag tag--filled">Privacy Policy</a>
+            <a href="https://discord.com/oauth2/authorize?client_id=1467904752816886037&permissions=414464732224&integration_type=0&scope=bot+applications.commands" class="tag tag--safety">Invite Bot</a>
+      <a href="https://discord.gg/Bhd4NpNqCh" class="tag">Support Server</a>
+    </div>
+  </div>
+</section>
+
+
+<!-- ====== FOOTER ====== -->
+<footer class="footer">
+  <div class="footer__inner">
+    <div class="footer__top">
+      <div class="footer__brand">
+        <h2 class="font-display footer__brand-name">LuckyBot<span class="accent">+</span></h2>
+        <p class="footer__brand-desc">Virtual economy and casino-style entertainment for Discord servers. Blackjack, Coin Flip, Lottery, Sicbo — all virtual, all free.</p>
+      </div>
+      <div class="footer__col">
+        <div class="footer__col-title">Games</div>
+        <a href="#games">Blackjack</a>
+        <a href="#games">Coin Flip</a>
+        <a href="#games">Lottery</a>
+        <a href="#games">Sicbo</a>
+      </div>
+      <div class="footer__col">
+        <div class="footer__col-title">Economy</div>
+        <a href="#games">Virtual Coins</a>
+        <a href="#games">XP & Levels</a>
+                <a href="#games">Profiles</a>
+        <a href="#setup">Commands</a>
+      </div>
+      <div class="footer__col">
+        <div class="footer__col-title">Legal & Support</div>
+        <a href="tos.html">Terms of Service</a>
+        <a href="privacy.html">Privacy Policy</a>
+                <a href="https://discord.gg/Bhd4NpNqCh">Support Server</a>
+        <a href="privacy.html#s12">Contact</a>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <span class="footer__copy">&copy; 2026 LuckyBot+. Entertainment only — no real money. &nbsp;|&nbsp; <a href="tos.html">Terms</a> &nbsp;•&nbsp; <a href="privacy.html">Privacy</a></span>
+      <button class="footer__back-top" id="backToTop" aria-label="Back to top">↑ Back to Top</button>
+    </div>
+  </div>
+</footer>
+
+
+<script>
+/* ============================================================
+   SCRIPTS
+   ============================================================ */
+(function () {
+  /* UTC Clock */
+  function updateClock() {
+    var now = new Date();
+    var h = String(now.getUTCHours()).padStart(2,'0');
+    var m = String(now.getUTCMinutes()).padStart(2,'0');
+    var s = String(now.getUTCSeconds()).padStart(2,'0');
+    var el = document.getElementById('utcClock');
+    if (el) el.textContent = h + ':' + m + ':' + s + ' UTC';
+  }
+  updateClock();
+  setInterval(updateClock, 1000);
+
+  /* Burger */
+  var burger = document.getElementById('headerBurger');
+  var nav    = document.getElementById('headerNav');
+  if (burger && nav) {
+    burger.addEventListener('click', function () {
+      var open = nav.classList.toggle('open');
+      burger.setAttribute('aria-expanded', open);
+    });
+  }
+
+  /* Back to top */
+  var btt = document.getElementById('backToTop');
+  if (btt) btt.addEventListener('click', function () { window.scrollTo({ top: 0, behavior: 'smooth' }); });
+
+  /* Scroll reveal */
+  var revealEls = document.querySelectorAll('.reveal');
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }
+      });
+    }, { threshold: 0.08 });
+    revealEls.forEach(function (el) { io.observe(el); });
+  } else {
+    revealEls.forEach(function (el) { el.classList.add('visible'); });
+  }
+
+  /* Live ribbon — animate coins counter */
+  var coinEls = document.querySelectorAll('.ribbon__value');
+  // just pulse a subtle opacity on first cell every 3s
+  setInterval(function () {
+    var statusCell = document.querySelector('.ribbon__cell:first-child .ribbon__value');
+    if (statusCell) {
+      statusCell.style.color = 'var(--term-green)';
+      setTimeout(function () { statusCell.style.color = ''; }, 600);
+    }
+  }, 3000);
+})();
+</script>
+
+</body>
+</html>

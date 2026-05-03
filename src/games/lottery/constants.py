@@ -1,0 +1,2 @@
+LOTTERY_STATUS_OPEN = "open"
+LOTTERY_STATUS_DRAWING = "drawing"

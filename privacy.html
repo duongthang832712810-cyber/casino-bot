@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Privacy Policy — LuckyBot+</title>
+<meta name="description" content="Privacy Policy for LuckyBot+ — what data we collect, how it's used, and how to request deletion.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet">
+<style>
+
+/* ============================================================
+   AXIS INDUSTRIAL — BASE SYSTEM
+   ============================================================ */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --base: #FFFFFF;
+  --ink: #000000;
+  --safety: #FF3E00;
+  --muted: #888888;
+  --surface: #F5F5F0;
+  --term-bg: #08080A;
+  --term-green: #00FF66;
+  --term-amber: #FFAA00;
+  --border: 4px solid var(--ink);
+  --border-thin: 1px solid var(--ink);
+  --shadow: 8px 8px 0px var(--ink);
+  --shadow-safety: 8px 8px 0px var(--safety);
+  --fs-hero: clamp(3.5rem, 10vw, 9rem);
+  --fs-h1: clamp(2rem, 4vw, 4rem);
+  --fs-h2: clamp(1.3rem, 2.5vw, 2rem);
+  --fs-h3: clamp(1rem, 1.5vw, 1.4rem);
+  --fs-body: clamp(0.85rem, 1vw, 1rem);
+  --fs-data: clamp(0.75rem, 0.85vw, 0.9rem);
+  --fs-micro: 0.6rem;
+  --gap: clamp(1rem, 2vw, 2rem);
+  --header-h: 44px;
+}
+
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+
+body {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 400;
+  font-size: var(--fs-body);
+  line-height: 1.65;
+  color: var(--ink);
+  background-color: var(--base);
+  overflow-x: hidden;
+}
+
+a { color: inherit; text-decoration: none; }
+ul { list-style: none; }
+::selection { background: var(--safety); color: var(--base); }
+
+h1, h2, h3, h4, .font-display {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  line-height: 0.9;
+  letter-spacing: -0.03em;
+}
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+.header {
+  position: fixed; top: 0; left: 0;
+  width: 100%; height: var(--header-h);
+  z-index: 1000;
+  background: var(--ink); color: var(--base);
+  border-bottom: 2px solid var(--safety);
+  display: flex; align-items: center;
+  padding: 0 clamp(1rem, 3vw, 3rem);
+}
+.header__inner {
+  width: 100%; max-width: 1440px; margin: 0 auto;
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+}
+.header__left { display: flex; align-items: center; gap: 1.2rem; }
+.header__logo {
+  font-family: 'Space Grotesk', sans-serif; font-weight: 700;
+  font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em;
+  display: flex; align-items: center; gap: 0.5rem; white-space: nowrap;
+}
+.header__logo-mark {
+  width: 22px; height: 22px; border: 2px solid var(--safety);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.header__logo-mark svg { width: 12px; height: 12px; }
+.header__sep { width: 1px; height: 16px; background: rgba(255,255,255,0.12); }
+.header__product { font-size: var(--fs-micro); letter-spacing: 0.14em; text-transform: uppercase; opacity: 0.4; }
+.header__nav {
+  display: flex; align-items: stretch; height: var(--header-h);
+  border-left: 1px solid rgba(255,255,255,0.10);
+}
+.header__nav a {
+  font-family: 'JetBrains Mono', monospace; font-size: var(--fs-micro);
+  text-transform: uppercase; letter-spacing: 0.12em;
+  padding: 0 1.2rem; display: flex; align-items: center;
+  border-right: 1px solid rgba(255,255,255,0.10);
+  color: rgba(255,255,255,0.5); transition: none;
+}
+.header__nav a:hover { background: var(--safety); color: var(--base); }
+.header__nav a.active { background: rgba(255,255,255,0.06); color: var(--base); }
+.header__right { display: flex; align-items: center; gap: 1.2rem; }
+.header__status { display: flex; align-items: center; gap: 0.4rem; font-size: var(--fs-micro); text-transform: uppercase; letter-spacing: 0.12em; }
+.header__status-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--term-green); animation: pulse 2s ease-in-out infinite; }
+.header__clock { font-family: 'JetBrains Mono', monospace; font-size: var(--fs-micro); font-weight: 500; letter-spacing: 0.08em; opacity: 0.7; min-width: 7em; text-align: right; }
+.header__burger { display: none; flex-direction: column; gap: 4px; cursor: pointer; background: none; border: none; padding: 4px; }
+.header__burger span { width: 22px; height: 2px; background: var(--base); }
+
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+/* ============================================================
+   PAGE HERO
+   ============================================================ */
+.doc-hero {
+  padding-top: calc(var(--header-h) + 4rem);
+  background: var(--ink);
+  color: var(--base);
+  border-bottom: var(--border);
+  position: relative;
+  overflow: hidden;
+}
+.doc-hero__grid {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+}
+.doc-hero__inner {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 clamp(1rem, 4vw, 4rem) 0;
+}
+.doc-hero__eyebrow {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--fs-micro);
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--safety);
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.doc-hero__eyebrow::before {
+  content: '';
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--safety);
+  animation: pulse 2s ease-in-out infinite;
+}
+.doc-hero__title {
+  font-size: var(--fs-hero);
+  line-height: 0.85;
+  letter-spacing: -0.04em;
+  margin-bottom: 3rem;
+}
+.doc-hero__meta {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border-top: var(--border);
+}
+.doc-hero__meta-cell {
+  padding: 1.2rem 1.5rem;
+  border-right: 1px solid rgba(255,255,255,0.12);
+  transition: none;
+  cursor: default;
+}
+.doc-hero__meta-cell:last-child { border-right: none; }
+.doc-hero__meta-cell:hover { background: var(--safety); }
+.doc-hero__meta-label { font-size: var(--fs-micro); text-transform: uppercase; letter-spacing: 0.18em; color: rgba(255,255,255,0.35); margin-bottom: 0.4rem; }
+.doc-hero__meta-val { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 0.9rem; letter-spacing: -0.01em; }
+
+/* ============================================================
+   NOTICE TICKER
+   ============================================================ */
+.notice-ticker {
+  background: var(--ink);
+  border-bottom: var(--border);
+  overflow: hidden;
+  padding: 0.7rem 0;
+}
+.notice-ticker__track {
+  display: flex;
+  width: max-content;
+  animation: tickerScroll 28s linear infinite;
+}
+.notice-ticker__item {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: clamp(0.75rem, 1.2vw, 1rem);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  color: var(--term-green);
+  padding: 0 2rem;
+  display: flex; align-items: center; gap: 2rem;
+}
+.notice-ticker__item::after {
+  content: '●';
+  font-size: 0.5em;
+  opacity: 0.5;
+}
+
+@keyframes tickerScroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* ============================================================
+   CONTENT LAYOUT
+   ============================================================ */
+.doc-body {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: clamp(3rem, 6vw, 6rem) clamp(1rem, 4vw, 4rem);
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: clamp(2rem, 4vw, 4rem);
+  align-items: start;
+}
+
+/* ---- TOC Sidebar ---- */
+.toc {
+  position: sticky;
+  top: calc(var(--header-h) + 2rem);
+  border: var(--border);
+  box-shadow: var(--shadow);
+  background: var(--surface);
+}
+.toc__header {
+  background: var(--ink); color: var(--base);
+  padding: 0.8rem 1.2rem;
+  font-size: var(--fs-micro); text-transform: uppercase; letter-spacing: 0.2em;
+  font-family: 'JetBrains Mono', monospace;
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.toc__header::before { content: '//'; color: var(--safety); }
+.toc__list { padding: 0.4rem 0; }
+.toc__item a {
+  display: flex; align-items: center; gap: 0.8rem;
+  padding: 0.55rem 1.2rem;
+  font-size: var(--fs-micro); text-transform: uppercase; letter-spacing: 0.1em;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+  color: var(--muted); transition: none;
+}
+.toc__item:last-child a { border-bottom: none; }
+.toc__item a:hover { background: var(--safety); color: var(--base); }
+.toc__item a .toc__num { color: var(--safety); font-size: 0.55rem; min-width: 1.8em; }
+.toc__item a:hover .toc__num { color: var(--base); }
+
+/* ---- Article ---- */
+.doc-article { min-width: 0; }
+
+.doc-section {
+  border: var(--border);
+  box-shadow: var(--shadow);
+  background: var(--base);
+  margin-bottom: var(--gap);
+  transition: none;
+}
+
+.doc-section--notice {
+  background: var(--term-bg);
+  color: var(--base);
+}
+
+.doc-section__header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1rem 1.5rem;
+  border-bottom: var(--border);
+  gap: 1rem;
+}
+.doc-section--notice .doc-section__header {
+  border-bottom: 4px solid rgba(255,255,255,0.1);
+}
+.doc-section__num {
+  font-family: 'Space Grotesk', sans-serif; font-weight: 700;
+  font-size: clamp(2rem, 3vw, 2.8rem); line-height: 1;
+  letter-spacing: -0.05em; opacity: 0.15; flex-shrink: 0;
+}
+.doc-section__title { font-size: var(--fs-h3); line-height: 0.9; flex: 1; }
+.doc-section__tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.52rem; text-transform: uppercase; letter-spacing: 0.14em;
+  padding: 0.25em 0.7em; border: 2px solid currentColor; white-space: nowrap; flex-shrink: 0;
+}
+.doc-section--notice .doc-section__tag { border-color: rgba(255,255,255,0.2); color: rgba(255,255,255,0.5); }
+
+.doc-section__body { padding: 1.5rem; }
+.doc-section__body p {
+  font-size: var(--fs-data); line-height: 1.85;
+  color: var(--muted); margin-bottom: 1rem;
+}
+.doc-section__body p:last-child { margin-bottom: 0; }
+.doc-section--notice .doc-section__body p { color: rgba(255,255,255,0.65); }
+
+.doc-section__body ul {
+  list-style: none; display: flex; flex-direction: column; gap: 0.6rem;
+}
+.doc-section__body ul li {
+  font-size: var(--fs-data); line-height: 1.75;
+  color: var(--muted);
+  padding: 0.5rem 0.8rem;
+  background: var(--surface);
+  border-left: 2px solid var(--safety);
+}
+.doc-section--notice ul li {
+  border-left-color: rgba(255,62,0,0.6);
+  background: rgba(255,255,255,0.04);
+  color: rgba(255,255,255,0.65);
+}
+
+.doc-section__body h4 {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--fs-micro); font-weight: 500;
+  text-transform: uppercase; letter-spacing: 0.2em;
+  color: var(--safety); margin-bottom: 0.8rem; margin-top: 1.2rem;
+}
+.doc-section__body h4:first-child { margin-top: 0; }
+
+/* ---- Data Table ---- */
+.data-table-wrap {
+  border: var(--border);
+  box-shadow: var(--shadow);
+  overflow-x: auto;
+  margin-top: 1rem;
+}
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--fs-data);
+}
+.data-table th {
+  background: var(--ink);
+  color: var(--base);
+  padding: 0.8rem 1rem;
+  text-align: left;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--fs-micro);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-weight: 500;
+  border-right: 1px solid rgba(255,255,255,0.08);
+  white-space: nowrap;
+}
+.data-table th:last-child { border-right: none; }
+.data-table td {
+  padding: 0.85rem 1rem;
+  border-bottom: var(--border-thin);
+  border-right: var(--border-thin);
+  vertical-align: top;
+  line-height: 1.7;
+  color: var(--muted);
+}
+.data-table td:last-child { border-right: none; }
+.data-table tr:last-child td { border-bottom: none; }
+.data-table tr:hover td { background: var(--surface); }
+.data-table .td-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 500;
+  color: var(--ink);
+  white-space: nowrap;
+}
+.data-table .td-tag {
+  display: inline-block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  padding: 0.15em 0.5em;
+  border: 1px solid var(--safety);
+  color: var(--safety);
+  margin-top: 0.2rem;
+}
+
+/* ---- Key Points Grid ---- */
+.kp-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+  border: var(--border);
+  box-shadow: var(--shadow);
+  margin-bottom: var(--gap);
+}
+.kp-cell {
+  padding: 1.5rem;
+  border-right: var(--border-thin);
+  border-bottom: var(--border-thin);
+  background: var(--base);
+  min-height: 140px;
+  display: flex; flex-direction: column; justify-content: space-between;
+  transition: none; cursor: default;
+}
+.kp-cell:nth-child(3n) { border-right: none; }
+.kp-cell:nth-last-child(-n+3) { border-bottom: none; }
+.kp-cell:hover { background: var(--ink); color: var(--base); }
+.kp-cell--dark { background: var(--ink); color: var(--base); }
+.kp-cell--dark:hover { background: var(--safety); }
+.kp-cell--safety { background: var(--safety); color: var(--base); }
+.kp-cell--safety:hover { background: var(--ink); }
+.kp-cell__id { font-size: 0.5rem; text-transform: uppercase; letter-spacing: 0.2em; opacity: 0.25; margin-bottom: 0.8rem; }
+.kp-cell__title { font-size: var(--fs-h3); margin-bottom: 0.5rem; line-height: 0.9; }
+.kp-cell__text { font-size: var(--fs-data); line-height: 1.65; opacity: 0.6; }
+.kp-cell:hover .kp-cell__text,
+.kp-cell--dark .kp-cell__text,
+.kp-cell--safety .kp-cell__text { opacity: 0.8; }
+
+/* ---- Chapter Labels ---- */
+.chapter-label {
+  display: flex; align-items: center; gap: 1.2rem;
+  margin-bottom: 1.5rem; margin-top: 3rem;
+}
+.chapter-label:first-child { margin-top: 0; }
+.chapter-label__line { flex: 1; height: 1px; background: var(--ink); opacity: 0.12; }
+.chapter-label__text {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--fs-micro); text-transform: uppercase;
+  letter-spacing: 0.25em; color: var(--muted);
+}
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+.footer {
+  background: var(--ink); color: var(--base);
+  padding: clamp(1.5rem, 3vw, 2.5rem) clamp(1rem, 4vw, 4rem);
+  border-top: var(--border);
+}
+.footer__inner {
+  max-width: 1440px; margin: 0 auto;
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: 1rem;
+}
+.footer__left { display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap; }
+.footer__logo { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.04em; }
+.footer__links { display: flex; gap: 1.2rem; }
+.footer__links a { font-size: var(--fs-micro); text-transform: uppercase; letter-spacing: 0.12em; opacity: 0.4; }
+.footer__links a:hover { opacity: 1; color: var(--safety); }
+.footer__copy { font-size: 0.62rem; color: rgba(255,255,255,0.3); letter-spacing: 0.05em; }
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 1024px) {
+  .doc-body { grid-template-columns: 1fr; }
+  .toc { position: static; }
+  .doc-hero__meta { grid-template-columns: repeat(2, 1fr); }
+  .doc-hero__meta-cell:nth-child(2) { border-right: none; }
+  .kp-grid { grid-template-columns: repeat(2, 1fr); }
+  .kp-cell:nth-child(3n) { border-right: var(--border-thin); }
+  .kp-cell:nth-child(2n) { border-right: none; }
+}
+@media (max-width: 768px) {
+  .header__nav { display: none; }
+  .header__product { display: none; }
+  .header__burger { display: flex; }
+  .header__nav.open {
+    display: flex; flex-direction: column;
+    position: absolute; top: var(--header-h); left: 0;
+    width: 100%; background: var(--ink);
+    border-bottom: 2px solid var(--safety);
+  }
+  .header__nav.open a {
+    border-right: none; border-bottom: 1px solid rgba(255,255,255,0.06);
+    padding: 0.9rem 1.5rem; height: auto;
+  }
+  .doc-hero__meta { grid-template-columns: 1fr; }
+  .doc-hero__meta-cell { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.12); }
+  .kp-grid { grid-template-columns: 1fr; }
+  .kp-cell, .kp-cell:nth-child(3n), .kp-cell:nth-child(2n) { border-right: none; border-bottom: var(--border-thin); }
+  .kp-cell:last-child { border-bottom: none; }
+  .footer__inner { flex-direction: column; align-items: flex-start; }
+}
+</style>
+</head>
+<body>
+
+<!-- ====== HEADER ====== -->
+<header class="header">
+  <div class="header__inner">
+    <div class="header__left">
+      <a href="index.html" class="header__logo" aria-label="LuckyBot+ Home">
+        <span class="header__logo-mark">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2L2 7V17L12 22L22 17V7L12 2Z" stroke="#FF3E00" stroke-width="2.5"/><line x1="12" y1="2" x2="12" y2="22" stroke="#FF3E00" stroke-width="2"/></svg>
+        </span>
+        LuckyBot+
+      </a>
+      <span class="header__sep"></span>
+      <span class="header__product">Legal / Privacy Policy</span>
+    </div>
+    <nav class="header__nav" id="headerNav">
+      <a href="index.html">Home</a>
+      <a href="tos.html">Terms</a>
+      <a href="privacy.html" class="active">Privacy</a>
+    </nav>
+    <div class="header__right">
+      <div class="header__status"><span class="header__status-dot"></span><span>Active</span></div>
+      <div class="header__clock" id="utcClock">--:--:-- UTC</div>
+    </div>
+    <button class="header__burger" id="headerBurger" aria-label="Toggle navigation">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<!-- ====== HERO ====== -->
+<section class="doc-hero">
+  <div class="doc-hero__grid" aria-hidden="true"></div>
+  <div class="doc-hero__inner">
+    <div class="doc-hero__eyebrow">// Legal Document — Privacy Policy</div>
+    <h1 class="doc-hero__title">Privacy<br>Policy</h1>
+    <div class="doc-hero__meta">
+      <div class="doc-hero__meta-cell">
+        <div class="doc-hero__meta-label">Effective Date</div>
+        <div class="doc-hero__meta-val">May 3, 2026</div>
+      </div>
+      <div class="doc-hero__meta-cell">
+        <div class="doc-hero__meta-label">Service</div>
+        <div class="doc-hero__meta-val">Discord LuckyBot+</div>
+      </div>
+      <div class="doc-hero__meta-cell">
+        <div class="doc-hero__meta-label">Data Sales</div>
+        <div class="doc-hero__meta-val">Never Sold</div>
+      </div>
+      <div class="doc-hero__meta-cell">
+        <div class="doc-hero__meta-label">Contact</div>
+        <div class="doc-hero__meta-val">@d.tris</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== NOTICE TICKER ====== -->
+<div class="notice-ticker" aria-label="Privacy notice">
+  <div class="notice-ticker__track">
+    <span class="notice-ticker__item">We do not sell your data</span>
+    <span class="notice-ticker__item">Only Discord IDs and virtual game data are stored</span>
+    <span class="notice-ticker__item">You can request data deletion at any time</span>
+    <span class="notice-ticker__item">We do not sell your data</span>
+    <span class="notice-ticker__item">Only Discord IDs and virtual game data are stored</span>
+    <span class="notice-ticker__item">You can request data deletion at any time</span>
+    <span class="notice-ticker__item">We do not sell your data</span>
+    <span class="notice-ticker__item">Only Discord IDs and virtual game data are stored</span>
+    <span class="notice-ticker__item">You can request data deletion at any time</span>
+  </div>
+</div>
+
+<!-- ====== BODY ====== -->
+<div class="doc-body">
+
+  <!-- TOC Sidebar -->
+  <aside class="toc" aria-label="Table of contents">
+    <div class="toc__header">Table of Contents</div>
+    <ul class="toc__list">
+      <li class="toc__item"><a href="#s0"><span class="toc__num">00</span>At a Glance</a></li>
+      <li class="toc__item"><a href="#s1"><span class="toc__num">01</span>Data We Collect</a></li>
+      <li class="toc__item"><a href="#s2"><span class="toc__num">02</span>Data We Don't Collect</a></li>
+      <li class="toc__item"><a href="#s3"><span class="toc__num">03</span>How We Use Data</a></li>
+      <li class="toc__item"><a href="#s4"><span class="toc__num">04</span>Data Storage</a></li>
+      <li class="toc__item"><a href="#s5"><span class="toc__num">05</span>Data Sharing</a></li>
+      <li class="toc__item"><a href="#s6"><span class="toc__num">06</span>Data Retention</a></li>
+      <li class="toc__item"><a href="#s7"><span class="toc__num">07</span>Your Rights</a></li>
+      <li class="toc__item"><a href="#s8"><span class="toc__num">08</span>Children's Privacy</a></li>
+      <li class="toc__item"><a href="#s9"><span class="toc__num">09</span>Security</a></li>
+      <li class="toc__item"><a href="#s10"><span class="toc__num">10</span>Third-Party Services</a></li>
+      <li class="toc__item"><a href="#s11"><span class="toc__num">11</span>Policy Updates</a></li>
+      <li class="toc__item"><a href="#s12"><span class="toc__num">12</span>Contact</a></li>
+    </ul>
+  </aside>
+
+  <!-- Article -->
+  <article class="doc-article">
+
+    <!-- AT A GLANCE GRID -->
+    <div class="chapter-label">
+      <span class="chapter-label__text">// Summary</span>
+      <span class="chapter-label__line"></span>
+    </div>
+
+    <div class="kp-grid" id="s0">
+      <div class="kp-cell kp-cell--dark">
+        <div class="kp-cell__id">GL-01</div>
+        <div class="kp-cell__title">Minimal<br>Data</div>
+        <div class="kp-cell__text">Only Discord IDs and game-related virtual data are stored. Nothing else.</div>
+      </div>
+      <div class="kp-cell kp-cell--safety">
+        <div class="kp-cell__id">GL-02</div>
+        <div class="kp-cell__title">Never<br>Sold</div>
+        <div class="kp-cell__text">Your data is never sold, rented, or monetized in any way.</div>
+      </div>
+      <div class="kp-cell">
+        <div class="kp-cell__id">GL-03</div>
+        <div class="kp-cell__title">You Can<br>Delete</div>
+        <div class="kp-cell__text">Contact the bot owner at any time to request deletion of your data.</div>
+      </div>
+    </div>
+
+    <!-- SUMMARY NOTICE -->
+    <div class="doc-section doc-section--notice" id="s-summary">
+      <div class="doc-section__header">
+        <div class="doc-section__num">//</div>
+        <h2 class="doc-section__title">Short Summary</h2>
+        <span class="doc-section__tag">Read This First</span>
+      </div>
+      <div class="doc-section__body">
+        <p>LuckyBot+ stores a limited set of Discord identifiers and virtual game data necessary to operate its economy, player profiles, casino-style games, lottery system, announcements, and server configuration features. No real personal information beyond what Discord already stores about you is collected. We do not sell, rent, share, or commercialize your data in any form. You can request deletion of your data at any time by contacting the bot owner.</p>
+      </div>
+    </div>
+
+    <!-- SECTION 1 -->
+    <div class="chapter-label" style="margin-top:3rem;">
+      <span class="chapter-label__text">// Data Collection</span>
+      <span class="chapter-label__line"></span>
+    </div>
+
+    <div class="doc-section" id="s1">
+      <div class="doc-section__header">
+        <div class="doc-section__num">01</div>
+        <h2 class="doc-section__title">Information We Collect</h2>
+        <span class="doc-section__tag">Transparency</span>
+      </div>
+      <div class="doc-section__body">
+        <p>The bot may store the following information when you or your server use its features. All data collected is strictly limited to what is required for the bot to function correctly.</p>
+        <div class="data-table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Data Type</th>
+                <th>Examples</th>
+                <th>Purpose</th>
+                <th>Required</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="td-label">Discord User ID</td>
+                <td>Numeric Discord user identifier</td>
+                <td>To maintain balances, EXP, statistics, game states, and profiles per user.</td>
+                <td><span class="td-tag">Yes</span></td>
+              </tr>
+              <tr>
+                <td class="td-label">Discord Guild ID</td>
+                <td>Numeric Discord server identifier</td>
+                <td>To store server-specific announcement channel settings and server configuration.</td>
+                <td><span class="td-tag">Yes</span></td>
+              </tr>
+              <tr>
+                <td class="td-label">Channel & Message IDs</td>
+                <td>Channel ID, Message ID</td>
+                <td>To send, edit, recover, or replace game announcement embeds and result messages.</td>
+                <td><span class="td-tag">Yes</span></td>
+              </tr>
+              <tr>
+                <td class="td-label">Virtual Economy Data</td>
+                <td>Coin balance, EXP, win/loss/draw counts, total games played</td>
+                <td>To operate the player economy, profile statistics, and leaderboard features.</td>
+                <td><span class="td-tag">Yes</span></td>
+              </tr>
+              <tr>
+                <td class="td-label">Active Game Data</td>
+                <td>Game type, Blackjack card state, Coin Flip choice, Lottery tickets held, Sicbo bets placed</td>
+                <td>To run games, resolve outcomes, prevent duplicate active sessions, and recover game state after bot restarts.</td>
+                <td><span class="td-tag">Yes</span></td>
+              </tr>
+              <tr>
+                <td class="td-label">Operational Logs</td>
+                <td>Error messages, command failure timestamps, stack traces</td>
+                <td>To debug issues, maintain bot security, and improve reliability over time.</td>
+                <td><span class="td-tag">Temporary</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="doc-section" id="s2">
+      <div class="doc-section__header">
+        <div class="doc-section__num">02</div>
+        <h2 class="doc-section__title">Information We Do Not Collect</h2>
+        <span class="doc-section__tag">Boundaries</span>
+      </div>
+      <div class="doc-section__body">
+        <p>To be explicit about what we do not collect:</p>
+        <ul>
+          <li>Passwords, authentication tokens, or account credentials of any kind.</li>
+          <li>Payment information, financial data, bank account numbers, or credit card details.</li>
+          <li>Government-issued identification, real names, physical addresses, or personally identifiable information (PII) beyond Discord's internal numeric IDs.</li>
+          <li>Email addresses — you are never required to provide an email to use this bot.</li>
+          <li>Message content, private messages, or the contents of any Discord channels (the bot only reads commands directed at it).</li>
+          <li>Device information, IP addresses, browser fingerprints, or geolocation data.</li>
+          <li>Real money, cryptocurrency, or any financial transaction data.</li>
+          <li>Information about users who never interact directly with the bot via commands.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- SECTION 3 -->
+    <div class="chapter-label" style="margin-top:3rem;">
+      <span class="chapter-label__text">// Data Usage & Storage</span>
+      <span class="chapter-label__line"></span>
+    </div>
+
+    <div class="doc-section" id="s3">
+      <div class="doc-section__header">
+        <div class="doc-section__num">03</div>
+        <h2 class="doc-section__title">How We Use Information</h2>
+        <span class="doc-section__tag">Purpose</span>
+      </div>
+      <div class="doc-section__body">
+        <p>All collected data is used exclusively for operating the bot's features. Specifically, stored data is used to:</p>
+        <ul>
+          <li>Create and maintain individual player profiles, virtual balances, experience points, and statistics.</li>
+          <li>Start, save, resume, and resolve casino-style game sessions for users across bot restarts.</li>
+          <li>Enforce one-active-game-per-user rules and prevent exploitation of the economy system.</li>
+          <li>Manage and distribute lottery tickets and process scheduled lottery draws.</li>
+          <li>Send, edit, and recover Discord embed messages and game result announcements in configured channels.</li>
+          <li>Maintain server-specific configuration such as designated announcement channels.</li>
+          <li>Respond to support and abuse inquiries, investigate reported bugs, and diagnose operational errors.</li>
+          <li>Detect and prevent abuse, exploitation, cheating, or violations of these Terms.</li>
+        </ul>
+        <p>Data is never used for advertising, profiling, marketing, or any purpose unrelated to operating the bot.</p>
+      </div>
+    </div>
+
+    <div class="doc-section" id="s4">
+      <div class="doc-section__header">
+        <div class="doc-section__num">04</div>
+        <h2 class="doc-section__title">Data Storage & Security</h2>
+        <span class="doc-section__tag">Infrastructure</span>
+      </div>
+      <div class="doc-section__body">
+        <p>Bot data is stored in a database controlled and maintained by the bot owner. The following technical measures are applied to protect stored data:</p>
+        <ul>
+          <li>Access to the database is restricted to authorized bot processes and the bot owner only.</li>
+          <li>Database credentials and connection strings are stored securely and are never exposed publicly.</li>
+          <li>The server and database software are kept up to date to mitigate known security vulnerabilities.</li>
+          <li>Operational logs containing sensitive debug information are retained for a limited period and are not publicly accessible.</li>
+        </ul>
+        <p>However, no system connected to the internet can guarantee absolute security. While we apply reasonable safeguards, we cannot warrant that stored data will be completely immune to unauthorized access, data breaches, or unforeseen security events. In the event of a significant data breach affecting user data, we will make reasonable efforts to notify affected users through available channels.</p>
+      </div>
+    </div>
+
+    <div class="doc-section" id="s5">
+      <div class="doc-section__header">
+        <div class="doc-section__num">05</div>
+        <h2 class="doc-section__title">Data Sharing</h2>
+        <span class="doc-section__tag">Third Parties</span>
+      </div>
+      <div class="doc-section__body">
+        <p>We do not sell, rent, trade, lease, or otherwise transfer your data to third parties for any commercial purpose. Data may only be shared in the following limited and necessary circumstances:</p>
+        <ul>
+          <li><strong>Hosting providers:</strong> The database and bot process run on infrastructure provided by a hosting service. This provider may have incidental access to stored data as part of their infrastructure operation, governed by their own privacy policies.</li>
+          <li><strong>Security or abuse response:</strong> If we believe your account is involved in a security incident, attack, or serious abuse of the bot, relevant data may be reviewed or shared as part of the investigation.</li>
+          <li><strong>Legal compliance:</strong> We may disclose data if required by a valid legal process, court order, law enforcement request, or other binding legal obligation.</li>
+          <li><strong>Discord platform:</strong> The bot operates on Discord's platform, and your use of Discord is additionally governed by Discord's own Privacy Policy and Terms of Service.</li>
+        </ul>
+        <p>Beyond the above, no data will be shared with any third party without your explicit consent.</p>
+      </div>
+    </div>
+
+    <!-- SECTION 6 -->
+    <div class="chapter-label" style="margin-top:3rem;">
+      <span class="chapter-label__text">// Retention & Rights</span>
+      <span class="chapter-label__line"></span>
+    </div>
+
+    <div class="doc-section" id="s6">
+      <div class="doc-section__header">
+        <div class="doc-section__num">06</div>
+        <h2 class="doc-section__title">Data Retention</h2>
+        <span class="doc-section__tag">Lifecycle</span>
+      </div>
+      <div class="doc-section__body">
+        <h4>// Persistent Data</h4>
+        <ul>
+          <li>Player profiles, virtual economy balances, experience points, and lifetime statistics are retained while the bot continues to provide services and the user's data has not been requested for deletion.</li>
+          <li>Server configuration data (announcement channels, settings) is retained for as long as the bot remains active in the server.</li>
+        </ul>
+        <h4>// Temporary Data</h4>
+        <ul>
+          <li>Active game session data (card states, bets, choices) is deleted automatically after the game resolves or the session expires.</li>
+          <li>Lottery ticket records are cleared after each lottery draw cycle completes.</li>
+          <li>Operational logs and error traces are retained for a limited time (typically 30–90 days) for debugging and security review, then purged.</li>
+        </ul>
+        <h4>// Extended Retention</h4>
+        <ul>
+          <li>Some data may be retained beyond standard periods if necessary to investigate active abuse cases, resolve ongoing disputes, or comply with applicable legal obligations.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="doc-section" id="s7">
+      <div class="doc-section__header">
+        <div class="doc-section__num">07</div>
+        <h2 class="doc-section__title">Your Rights & Data Control</h2>
+        <span class="doc-section__tag">User Rights</span>
+      </div>
+      <div class="doc-section__body">
+        <p>Depending on your jurisdiction, you may have certain rights regarding your personal data. We respect these rights and will honor valid requests to the best of our ability:</p>
+        <ul>
+          <li><strong>Right to access:</strong> You can request a summary of what data the bot holds associated with your Discord User ID.</li>
+          <li><strong>Right to deletion:</strong> You can request that your bot-related data (profile, balance, game history) be deleted by contacting the bot owner. Note that some data may be temporarily retained if needed for active security investigations or ongoing game resolution.</li>
+          <li><strong>Right to correction:</strong> If you believe data associated with your account is inaccurate, you may request a review.</li>
+          <li><strong>Right to restriction:</strong> You may request that we stop processing your data in certain ways while a deletion or correction request is pending.</li>
+        </ul>
+        <p>Server owners may additionally request removal of their server's configuration and guild-level data by contacting the bot owner and confirming their ownership of the relevant server.</p>
+        <p>To exercise any of these rights, please contact the bot owner using the contact information provided in Section 12. We aim to respond to all valid requests within 30 days.</p>
+      </div>
+    </div>
+
+    <!-- SECTION 8 -->
+    <div class="chapter-label" style="margin-top:3rem;">
+      <span class="chapter-label__text">// Compliance & Third Parties</span>
+      <span class="chapter-label__line"></span>
+    </div>
+
+    <div class="doc-section" id="s8">
+      <div class="doc-section__header">
+        <div class="doc-section__num">08</div>
+        <h2 class="doc-section__title">Children's Privacy</h2>
+        <span class="doc-section__tag">Protection</span>
+      </div>
+      <div class="doc-section__body">
+        <p>LuckyBot+ is not directed at or designed for children who are not permitted to use Discord under Discord's Terms of Service for their region. We do not knowingly collect, store, or process personal information from users who do not meet Discord's minimum age requirement.</p>
+        <p>If a parent or guardian believes their child has interacted with the bot in violation of Discord's age requirements, they should contact the bot owner immediately. We will take reasonable steps to delete any data associated with the user's account upon confirmation.</p>
+        <p>Server administrators have a particular responsibility to ensure the bot is used appropriately within their community, including enforcing age-appropriate access.</p>
+      </div>
+    </div>
+
+    <div class="doc-section" id="s9">
+      <div class="doc-section__header">
+        <div class="doc-section__num">09</div>
+        <h2 class="doc-section__title">Security Practices</h2>
+        <span class="doc-section__tag">Security</span>
+      </div>
+      <div class="doc-section__body">
+        <p>We take the security of stored data seriously and implement reasonable technical and organizational measures to protect it from unauthorized access, alteration, disclosure, or destruction. Specific measures include:</p>
+        <ul>
+          <li>Database access is restricted exclusively to the bot process and the bot owner — no public database endpoints are exposed.</li>
+          <li>All credentials, tokens, and API keys are stored as environment variables and are never committed to any public code repository.</li>
+          <li>The bot host and database server software are regularly updated to apply security patches.</li>
+          <li>Sensitive operational logs are stored separately from economy data and have restricted access.</li>
+        </ul>
+        <p>Despite these measures, no internet-connected system can provide absolute security guarantees. You use this bot understanding that residual security risks exist, as with any online service.</p>
+      </div>
+    </div>
+
+    <div class="doc-section" id="s10">
+      <div class="doc-section__header">
+        <div class="doc-section__num">10</div>
+        <h2 class="doc-section__title">Third-Party Services</h2>
+        <span class="doc-section__tag">External</span>
+      </div>
+      <div class="doc-section__body">
+        <p>The bot depends on a number of third-party services and platforms as part of its infrastructure:</p>
+        <ul>
+          <li><strong>Discord:</strong> The bot operates entirely on Discord's platform. Discord collects its own data about users as described in Discord's Privacy Policy at discord.com/privacy. We have no control over Discord's data practices.</li>
+          <li><strong>Hosting provider:</strong> The bot process and database are hosted on a third-party server or cloud infrastructure provider. This provider operates under its own privacy and data handling policies.</li>
+          <li><strong>Database service:</strong> If a managed database service is used (e.g., a cloud database provider), that provider may have incidental access to stored data under the terms of their service agreement.</li>
+        </ul>
+        <p>We encourage you to review Discord's own Privacy Policy as it governs the majority of data associated with your use of Discord and any bots operating on it.</p>
+      </div>
+    </div>
+
+    <div class="doc-section" id="s11">
+      <div class="doc-section__header">
+        <div class="doc-section__num">11</div>
+        <h2 class="doc-section__title">Policy Updates</h2>
+        <span class="doc-section__tag">Versioning</span>
+      </div>
+      <div class="doc-section__body">
+        <p>We may update this Privacy Policy from time to time to reflect changes in our data practices, new bot features, legal requirements, or other operational reasons. When this Policy is updated:</p>
+        <ul>
+          <li>The updated Policy will be posted at this URL with a new effective date.</li>
+          <li>Significant changes may be announced in the bot's support server or through an announcement channel, if configured.</li>
+          <li>We are not obligated to provide individual notice to every user for every update, so we recommend checking this page periodically.</li>
+          <li>Your continued use of LuckyBot+ after the effective date of an updated Policy constitutes your acceptance of the revised terms.</li>
+        </ul>
+        <p>If you disagree with any changes to this Policy, you should stop using the bot and may contact us to request deletion of your stored data.</p>
+      </div>
+    </div>
+
+    <div class="doc-section" id="s12">
+      <div class="doc-section__header">
+        <div class="doc-section__num">12</div>
+        <h2 class="doc-section__title">Contact</h2>
+        <span class="doc-section__tag">Support</span>
+      </div>
+      <div class="doc-section__body">
+        <p>For any privacy-related questions, data access requests, deletion requests, or concerns about how your data is handled, please contact the bot owner through your preferred method:</p>
+        <ul>
+          <li><strong>Discord Username:</strong> @d.tris</li>
+          <li><strong>Support Server:</strong> https://discord.gg/Bhd4NpNqCh</li>
+          <li><strong>Email:</strong> huynhtridung22042006.1@gmail.com</li>
+        </ul>
+        <p>We will make reasonable efforts to respond to all privacy-related requests within 30 days. Deletion requests may take additional time to process depending on the complexity and scope of data involved.</p>
+        <p>You may also contact Discord directly at discord.com/privacy for any issues related to Discord's own handling of your data.</p>
+      </div>
+    </div>
+
+  </article>
+</div>
+
+<!-- ====== FOOTER ====== -->
+<footer class="footer">
+  <div class="footer__inner">
+    <div class="footer__left">
+      <span class="footer__logo font-display">LuckyBot<span style="color:var(--safety)">+</span></span>
+      <div class="footer__links">
+        <a href="index.html">Home</a>
+        <a href="tos.html">Terms</a>
+        <a href="privacy.html">Privacy</a>
+        <a href="https://discord.gg/Bhd4NpNqCh">Support</a>
+      </div>
+    </div>
+    <span class="footer__copy">&copy; 2026 LuckyBot+. Entertainment only — no real money.</span>
+  </div>
+</footer>
+
+<script>
+  function updateClock() {
+    const now = new Date();
+    const h = String(now.getUTCHours()).padStart(2,'0');
+    const m = String(now.getUTCMinutes()).padStart(2,'0');
+    const s = String(now.getUTCSeconds()).padStart(2,'0');
+    const el = document.getElementById('utcClock');
+    if (el) el.textContent = h + ':' + m + ':' + s + ' UTC';
+  }
+  updateClock();
+  setInterval(updateClock, 1000);
+
+  const burger = document.getElementById('headerBurger');
+  const nav = document.getElementById('headerNav');
+  if (burger && nav) {
+    burger.addEventListener('click', () => {
+      const open = nav.classList.toggle('open');
+      burger.setAttribute('aria-expanded', open);
+    });
+  }
+</script>
+</body>
+</html>
