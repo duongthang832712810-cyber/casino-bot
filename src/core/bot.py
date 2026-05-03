@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging
 
 import discord
+from discord import app_commands
 from discord.ext import commands
 
 from src.config.settings import Settings
@@ -17,6 +18,7 @@ from src.repositories.coinflip_repository import CoinFlipRepository
 from src.repositories.lottery_repository import LotteryRepository
 from src.repositories.sicbo_repository import SicboRepository
 from src.repositories.user_repository import UserRepository
+from src.services.daily_reward_service import DailyRewardService
 from src.services.game_lock_service import GameLockService
 
 LOGGER = logging.getLogger(__name__)
@@ -40,6 +42,7 @@ class CasinoBot(commands.Bot):
         self.coinflip_service: CoinFlipService | None = None
         self.lottery_service: LotteryService | None = None
         self.sicbo_service: SicboService | None = None
+        self.daily_reward_service: DailyRewardService | None = None
 
     async def setup_hook(self) -> None:
         await self.db.connect()
@@ -79,6 +82,15 @@ class CasinoBot(commands.Bot):
             self.settings.default_coins,
             self,
         )
+        self.daily_reward_service = DailyRewardService(
+            self.db,
+            self.user_repository,
+            self.settings.default_coins,
+            self.settings.daily_reward,
+            self.settings.daily_cooldown_seconds,
+        )
+
+        self.tree.on_error = self.on_app_command_error
 
         await self.load_extension("src.games.blackjack.cog")
         await self.load_extension("src.games.coinflip.cog")
@@ -108,3 +120,46 @@ class CasinoBot(commands.Bot):
 
     async def on_ready(self) -> None:
         LOGGER.info("Logged in as %s (%s)", self.user, self.user.id if self.user else "unknown")
+
+    async def on_command_error(self, ctx: commands.Context, error: commands.CommandError) -> None:
+        if isinstance(error, commands.CommandNotFound):
+            return
+        if isinstance(error, (commands.MissingPermissions, commands.BotMissingPermissions)):
+            await ctx.reply("You do not have permission to use this command.", mention_author=False)
+            return
+        if isinstance(error, commands.MissingRequiredArgument):
+            await ctx.reply(f"Missing required argument: `{error.param.name}`.", mention_author=False)
+            return
+        if isinstance(error, commands.BadArgument):
+            await ctx.reply(f"Invalid command argument. Use `{ctx.clean_prefix}help` to view command usage.", mention_author=False)
+            return
+        if isinstance(error, commands.CommandInvokeError) and isinstance(error.original, Exception):
+            LOGGER.error("Unexpected prefix command error", exc_info=_exception_info(error.original))
+            await ctx.reply("An unexpected error occurred. Please try again later.", mention_author=False)
+            return
+
+        LOGGER.error("Unexpected prefix command error", exc_info=_exception_info(error))
+        await ctx.reply("An unexpected error occurred. Please try again later.", mention_author=False)
+
+    async def on_app_command_error(self, interaction: discord.Interaction, error: app_commands.AppCommandError) -> None:
+        if isinstance(error, app_commands.MissingPermissions):
+            await self._send_interaction_error(interaction, "You do not have permission to use this command.")
+            return
+        if isinstance(error, app_commands.CommandInvokeError):
+            LOGGER.error("Unexpected slash command error", exc_info=_exception_info(error.original))
+            await self._send_interaction_error(interaction, "An unexpected error occurred. Please try again later.")
+            return
+
+        LOGGER.error("Unexpected slash command error", exc_info=_exception_info(error))
+        await self._send_interaction_error(interaction, "An unexpected error occurred. Please try again later.")
+
+    @staticmethod
+    async def _send_interaction_error(interaction: discord.Interaction, message: str) -> None:
+        if interaction.response.is_done():
+            await interaction.followup.send(message, ephemeral=True)
+            return
+        await interaction.response.send_message(message, ephemeral=True)
+
+
+def _exception_info(exc: BaseException) -> tuple[type[BaseException], BaseException, object]:
+    return (type(exc), exc, exc.__traceback__)

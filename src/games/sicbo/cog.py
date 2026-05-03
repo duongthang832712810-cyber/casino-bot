@@ -56,7 +56,7 @@ class SicboCog(commands.Cog):
             await self._send_prefix_info(ctx)
             return
         if amount is None:
-            await ctx.reply("Usage: `!sb <big|small|tai|xiu> <amount>`", mention_author=False)
+            await ctx.reply(f"Usage: `{ctx.clean_prefix}sb <big|small|tai|xiu> <amount>`", mention_author=False)
             return
         await self._handle_prefix_bet(ctx, choice, amount)
 
