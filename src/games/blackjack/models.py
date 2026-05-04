@@ -31,3 +31,4 @@ class BlackjackActionResult:
     exp_delta: int = 0
     progression: ProgressionUpdate | None = None
     message: str | None = None
+    achievement_message: str | None = None

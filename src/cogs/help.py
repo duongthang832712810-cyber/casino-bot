@@ -4,6 +4,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
+from src.config import baucua as baucua_config
 from src.config import blackjack as blackjack_config
 from src.config import coinflip as coinflip_config
 from src.config import lottery as lottery_config
@@ -15,15 +16,17 @@ from src.config.emojis import (
     COIN_EMOJI,
     COINFLIP_HEADS_EMOJI,
     COINFLIP_TAILS_EMOJI,
+    BAUCUA_BOWL_EMOJI,
     SICBO_BOWL_EMOJI,
     RESULT_DRAW_EMOJI,
     RESULT_LOSE_EMOJI,
     RESULT_WIN_EMOJI,
     TICKET_EMOJI,
 )
+from src.utils.footer import random_footer_text
 from src.utils.money import format_coin, format_number
 
-HELP_PAGE_COUNT = 4
+HELP_PAGE_COUNT = 5
 
 
 class HelpCog(commands.Cog):
@@ -82,6 +85,7 @@ def _page_name(page: int) -> str:
         2: "Coin Flip",
         3: "Lottery",
         4: "Sicbo",
+        5: "Baucua",
     }
     return names[page]
 
@@ -92,6 +96,7 @@ def _page_emoji(page: int) -> str:
         2: COINFLIP_HEADS_EMOJI,
         3: TICKET_EMOJI,
         4: SICBO_BOWL_EMOJI,
+        5: BAUCUA_BOWL_EMOJI,
     }
     return emojis[page]
 
@@ -108,7 +113,9 @@ def _help_embed(page: int) -> discord.Embed:
         return _coinflip_help_embed()
     if page == 3:
         return _lottery_help_embed()
-    return _sicbo_help_embed()
+    if page == 4:
+        return _sicbo_help_embed()
+    return _baucua_help_embed()
 
 
 def _blackjack_help_embed() -> discord.Embed:
@@ -154,7 +161,7 @@ def _blackjack_help_embed() -> discord.Embed:
         inline=False,
     )
 
-    embed.set_footer(text="Page 1 / 4  •  Use the buttons to change pages")
+    embed.set_footer(text=random_footer_text())
     return embed
 
 
@@ -198,7 +205,7 @@ def _coinflip_help_embed() -> discord.Embed:
         inline=False,
     )
 
-    embed.set_footer(text="Page 2 / 4  •  Use the buttons to change pages")
+    embed.set_footer(text=random_footer_text())
     return embed
 
 
@@ -257,7 +264,7 @@ def _lottery_help_embed() -> discord.Embed:
         inline=False,
     )
 
-    embed.set_footer(text="Page 3 / 4  •  Use the buttons to change pages")
+    embed.set_footer(text=random_footer_text())
     return embed
 
 
@@ -307,7 +314,57 @@ def _sicbo_help_embed() -> discord.Embed:
         inline=False,
     )
 
-    embed.set_footer(text="Page 4 / 4  •  Use the buttons to change pages")
+    embed.set_footer(text=random_footer_text())
+    return embed
+
+
+def _baucua_help_embed() -> discord.Embed:
+    embed = discord.Embed(
+        title="Baucua — Help",
+        description=(
+            "*Bet on Deer, Pear, Chicken, Fish, Crab, or Shrimp before the round closes.*\n"
+            "━━━━━━━━━━━━━━━━━━━━━━"
+        ),
+        color=0xE67E22,
+    )
+
+    embed.add_field(
+        name="Commands",
+        value=(
+            "**Place a bet**\n"
+            "`/bc bet <choice> <amount>`\n"
+            "`!bc bet <choice> <amount>`\n"
+            "`!baucua bet <choice> <amount>`\n\n"
+            "**View current round**\n"
+            "`/bc info` or `!bc info`\n\n"
+            "**Set round channel**\n"
+            "`/bc set <channel>`\n"
+            "`!bc set #channel`"
+        ),
+        inline=False,
+    )
+
+    embed.add_field(
+        name="Config",
+        value=(
+            f"Minimum bet: {format_coin(baucua_config.MIN_BET)}"
+            f"{_max_bet_text(baucua_config.MAX_BET)}\n"
+            f"Round time: **{format_number(baucua_config.ROUND_SECONDS)} seconds**\n"
+            f"Payout per hit: bet x{format_number(baucua_config.PAYOUT_MULTIPLIER)} {COIN_EMOJI}"
+        ),
+        inline=False,
+    )
+
+    embed.add_field(
+        name="Winning rules",
+        value=(
+            f"{RESULT_WIN_EMOJI} Each matching symbol pays bet x{format_number(baucua_config.PAYOUT_MULTIPLIER)}\n"
+            "One matching symbol pays once, two matching symbols pay twice, and three matching symbols pay three times."
+        ),
+        inline=False,
+    )
+
+    embed.set_footer(text=random_footer_text())
     return embed
 
 

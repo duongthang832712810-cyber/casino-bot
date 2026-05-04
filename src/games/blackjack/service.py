@@ -12,8 +12,10 @@ from src.games.blackjack.scoring import is_blackjack, is_bust
 from src.games.common.payout import blackjack_payout
 from src.repositories.blackjack_repository import BlackjackRepository
 from src.repositories.user_repository import UserRepository
+from src.services.achievement_service import format_achievement_unlocks
 from src.services.exp_service import ExpService
 from src.services.game_lock_service import GameLockService
+from src.services.game_stats_service import GameStatsService
 from src.utils.money import format_coin
 
 
@@ -25,12 +27,14 @@ class BlackjackService:
         games: BlackjackRepository,
         locks: GameLockService,
         default_coins: int,
+        game_stats: GameStatsService,
     ) -> None:
         self.db = db
         self.users = users
         self.games = games
         self.locks = locks
         self.default_coins = default_coins
+        self.game_stats = game_stats
 
     async def start_or_resume(self, user_id: str, bet_amount: int) -> BlackjackActionResult:
         async with self.locks.lock(user_id):
@@ -118,7 +122,8 @@ class BlackjackService:
 
                 payout, _net = blackjack_payout(game.bet_amount, result)
                 exp_delta = ExpService.exp_delta_for_result(game.bet_amount, result)
-                progression = await self.users.update_after_result(user_id, payout, exp_delta, result)
+                progression = await self.users.update_after_result(user_id, game.bet_amount, payout, exp_delta, result)
+                stats_result = await self.game_stats.record_result(user_id, GAME_BLACKJACK, result, game.bet_amount, payout)
                 await self.games.delete(user_id)
 
             payout, net = blackjack_payout(game.bet_amount, result)
@@ -131,6 +136,7 @@ class BlackjackService:
                 net=net,
                 exp_delta=exp_delta,
                 progression=progression,
+                achievement_message=format_achievement_unlocks(user_id, stats_result.achievements),
             )
 
     async def save_message(self, user_id: str, channel_id: int | None, message_id: int | None) -> None:
@@ -145,8 +151,10 @@ class BlackjackService:
         payout, net = blackjack_payout(game.bet_amount, result)
         exp_delta = ExpService.exp_delta_for_result(game.bet_amount, result)
         async with immediate_transaction(self.db):
-            progression = await self.users.update_after_result(user_id, payout, exp_delta, result)
+            progression = await self.users.update_after_result(user_id, game.bet_amount, payout, exp_delta, result)
+            stats_result = await self.game_stats.record_result(user_id, GAME_BLACKJACK, result, game.bet_amount, payout)
             await self.games.delete(user_id)
+
         return BlackjackActionResult(
             game=game,
             finished=True,
@@ -155,7 +163,8 @@ class BlackjackService:
             net=net,
             exp_delta=exp_delta,
             progression=progression,
-        )
+            achievement_message=format_achievement_unlocks(user_id, stats_result.achievements),
+            )
 
     async def _require_game(self, user_id: str) -> BlackjackGame:
         game = await self.games.get_by_user_id(user_id)

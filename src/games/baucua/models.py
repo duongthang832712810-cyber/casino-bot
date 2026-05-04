@@ -6,23 +6,22 @@ from src.services.progression_service import ProgressionUpdate
 
 
 @dataclass(slots=True)
-class SicboState:
+class BaucuaState:
     round_id: int
     status: str
     started_at: int
     ends_at: int
     channel_id: str | None = None
     message_id: str | None = None
-    result: str | None = None
-    dice_1: int | None = None
-    dice_2: int | None = None
-    dice_3: int | None = None
+    result_1: str | None = None
+    result_2: str | None = None
+    result_3: str | None = None
     created_at: int = 0
     updated_at: int = 0
 
 
 @dataclass(slots=True)
-class SicboAnnouncement:
+class BaucuaAnnouncement:
     guild_id: str
     channel_id: str
     message_id: str | None
@@ -31,7 +30,7 @@ class SicboAnnouncement:
 
 
 @dataclass(slots=True)
-class SicboBet:
+class BaucuaBet:
     bet_id: int
     round_id: int
     user_id: str
@@ -42,25 +41,23 @@ class SicboBet:
 
 
 @dataclass(frozen=True, slots=True)
-class SicboRoundView:
-    state: SicboState
-    bets: list[SicboBet]
+class BaucuaRoundView:
+    state: BaucuaState
+    bets: list[BaucuaBet]
 
 
 @dataclass(frozen=True, slots=True)
-class SicboBetResult:
-    state: SicboState
-    bets: list[SicboBet]
-    user_bet: SicboBet
+class BaucuaBetResult:
+    state: BaucuaState
+    bets: list[BaucuaBet]
+    user_bet: BaucuaBet
 
 
 @dataclass(frozen=True, slots=True)
-class SicboResolveResult:
-    old_state: SicboState
-    bets: list[SicboBet]
-    result: str
-    dice: tuple[int, int, int]
-    total: int
+class BaucuaResolveResult:
+    old_state: BaucuaState
+    bets: list[BaucuaBet]
+    results: tuple[str, str, str]
     total_payout: int
     progressions: dict[str, ProgressionUpdate]
     achievement_messages: list[str]

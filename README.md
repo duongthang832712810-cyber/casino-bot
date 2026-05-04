@@ -42,8 +42,9 @@
 - Coin balance system
 - Daily reward with cooldown
 - Peer-to-peer coin transfers
-- User profiles with stats display
-- EXP progress bar with custom emoji
+- Paginated user profiles with game stats
+- Current Lottery ticket count in profile
+- EXP progress bar with rank emojis
 
 </td>
 <td width="50%">
@@ -52,7 +53,8 @@
 - Level & EXP system
 - Win / Lose / Draw EXP rates
 - Level-up & level-drop notifications
-- EXP scaled from bet amount
+- Game stats, streaks, and achievements
+- Leaderboards for coins, level, wins, profit, bets, and achievements
 
 </td>
 </tr>
@@ -64,6 +66,7 @@
 - Coin Flip -- Delayed resolution, edited result
 - Lottery -- Multi-tier jackpot pool system
 - Sicbo -- Global round-based Big/Small dice game
+- Baucua -- Global round-based symbol betting game
 
 </td>
 <td width="50%">
@@ -93,10 +96,14 @@ LuckyBot+/
 |   |   |-- general.py            # Economy defaults, daily reward, EXP & level config
 |   |   |-- emojis.py             # Centralized custom emoji constants
 |   |   |-- footer.py             # Random footer message pool
+|   |   |-- achievements.py       # Achievement definitions
+|   |   |-- leaderboard.py        # Leaderboard config
+|   |   |-- ranks.py              # Rank display config
 |   |   |-- blackjack.py          # Blackjack bet & payout config
 |   |   |-- coinflip.py           # Coin Flip delay & payout config
 |   |   |-- lottery.py            # Lottery draw, jackpot & tier config
-|   |   `-- sicbo.py              # Sicbo round, bet & display config
+|   |   |-- sicbo.py              # Sicbo round, bet & display config
+|   |   `-- baucua.py             # Baucua round, bet & display config
 |   |-- core/                     # Setup, constants, errors, checks, logging
 |   |-- db/                       # SQLite connection, schema, migrations
 |   |-- games/                    # Game packages
@@ -201,7 +208,7 @@ LuckyBot+ supports both **slash commands** (`/`) and **prefix commands** (`!`). 
 
 | Command | Description |
 |:--------|:------------|
-| `/profile` | View your stats, level, EXP progress bar, and ticket count |
+| `/profile` / `!profile` | View your paginated profile, level, EXP, coins, current Lottery tickets, per-game stats, and achievements |
 
 ---
 
@@ -209,6 +216,7 @@ LuckyBot+ supports both **slash commands** (`/`) and **prefix commands** (`!`). 
 
 ```
 /bj bet <amount>
+!bj bet <amount>
 ```
 
 | Action | Description |
@@ -227,6 +235,7 @@ LuckyBot+ supports both **slash commands** (`/`) and **prefix commands** (`!`). 
 
 ```
 /cf bet <h|heads|t|tails> <amount>
+!cf bet <h|heads|t|tails> <amount>
 ```
 
 - Bet is deducted immediately upon starting.
@@ -243,7 +252,12 @@ LuckyBot+ supports both **slash commands** (`/`) and **prefix commands** (`!`). 
 | `/lt random <qty>` | Buy tickets with randomly assigned numbers |
 | `/lt tickets` | View your tickets for the current draw |
 | `/lt info` | View draw details and current jackpot pool |
-| `/lt set channel` | *(Admin)* Set the Lottery announcement channel |
+| `/lt set <channel>` | *(Admin)* Set the Lottery announcement channel |
+| `!lt buy <number> <qty>` | Prefix ticket purchase command |
+| `!lt random <qty>` | Prefix random ticket purchase command |
+| `!lt tickets` | Prefix current tickets command |
+| `!lt info` | Prefix draw info command |
+| `!lt set #channel` | *(Admin)* Prefix announcement channel command |
 
 **Payout tiers** -- only the highest match pays per ticket:
 
@@ -254,7 +268,7 @@ LuckyBot+ supports both **slash commands** (`/`) and **prefix commands** (`!`). 
 | Last 3 digits | Fixed payout |
 | All 4 digits | [JACKPOT] Split equally among all winners |
 
-> If no one wins the jackpot, the pool carries forward to the next draw with the initial seed added on top.
+> If no one wins the jackpot, the pool carries forward. If the jackpot is hit, the next pool starts from the initial seed plus any split remainder.
 
 ---
 
@@ -268,7 +282,10 @@ LuckyBot+ supports both **slash commands** (`/`) and **prefix commands** (`!`). 
 |:--------|:------------|
 | `/sb bet <choice> <amount>` | Place your bet for the current round |
 | `/sb info` | View current round info and open bets |
-| `/sb set channel` | *(Admin)* Set the Sicbo announcement channel |
+| `/sb set <channel>` | *(Admin)* Set the Sicbo announcement channel |
+| `!sb bet <choice> <amount>` | Prefix bet command |
+| `!sb info` | Prefix current round info command |
+| `!sb set #channel` | *(Admin)* Prefix announcement channel command |
 
 **Dice outcome rules:**
 
@@ -279,6 +296,31 @@ LuckyBot+ supports both **slash commands** (`/`) and **prefix commands** (`!`). 
 | House wins | Dice total 3 or 18 -- both sides lose |
 
 > Sicbo is a global, round-based game. Level-change messages for all players in a round are combined into one message to avoid spam.
+
+---
+
+### Baucua
+
+```
+/bc bet <deer|pear|chicken|fish|crab|shrimp> <amount>
+```
+
+| Command | Description |
+|:--------|:------------|
+| `/bc bet <choice> <amount>` | Place your bet for the current round |
+| `/bc info` | View current round info and open bets |
+| `/bc set <channel>` | *(Admin)* Set the Baucua announcement channel |
+| `!bc bet <choice> <amount>` | Prefix bet command |
+| `!baucua bet <choice> <amount>` | Prefix alias bet command |
+
+Baucua supports choices: deer, pear, chicken, fish, crab, and shrimp.
+Vietnamese aliases are also accepted for common inputs such as nai, bau, ga, ca, cua, and tom.
+Each round rolls three symbols.
+Each matching symbol pays bet x2.
+If a user bets 100 coins on Chicken and one Chicken appears, the displayed payout is +200 coins and the net profit is 100 coins.
+If two Chickens appear, the displayed payout is +400 coins and the net profit is 300 coins.
+If three Chickens appear, the displayed payout is +600 coins and the net profit is 500 coins.
+The Baucua result embed deletes losing bettor names and shows only winning fields with displayed gross payout.
 
 ---
 
@@ -294,14 +336,28 @@ LuckyBot+ supports both **slash commands** (`/`) and **prefix commands** (`!`). 
 | 2 | Coin Flip |
 | 3 | Lottery |
 | 4 | Sicbo |
+| 5 | Baucua |
 
 Use the navigation buttons to switch between pages.
 
 ---
 
+### Leaderboard
+
+| Command | Description |
+|:--------|:------------|
+| `/top [category] [game]` | View casino leaderboards |
+| `!top [category] [game]` | Prefix leaderboard command |
+
+Categories: `coins`, `level`, `wins`, `profit`, `bet`, `achievements`.
+Game filters: `all`, `blackjack`, `coinflip`, `lottery`, `sicbo`, `baucua`.
+Coins, level, and achievements are global-only; wins, profit, and bet can be filtered by game.
+
+---
+
 ## Progression System
 
-EXP is earned or lost after every game (Lottery excluded). Amount scales with your bet.
+EXP is earned or lost after resolved wager games. Lottery records stats and achievements, but does not grant EXP. EXP amount scales with your bet.
 
 | Result | EXP Rate |
 |:-------|:--------:|
@@ -334,10 +390,14 @@ All tunable values live in `src/config/`. Game logic never hardcodes numbers. St
 | File | Controls |
 |:-----|:---------|
 | `general.py` | Default coins, daily reward, daily cooldown, EXP rates, level growth multiplier, progress bar width |
+| `achievements.py` | Global and per-game achievement definitions |
+| `leaderboard.py` | Leaderboard categories and limits |
+| `ranks.py` | Rank thresholds and rank emoji mapping |
 | `blackjack.py` | Min/max bet, dealer behavior rules, payout multipliers |
 | `coinflip.py` | Min/max bet, resolve delay duration, payout multiplier |
 | `lottery.py` | Ticket price, tier payouts, jackpot seed, house edge rate |
 | `sicbo.py` | Round duration, min/max bet, payout multiplier |
+| `baucua.py` | Round duration, min/max bet, payout multiplier, displayed bettor limit |
 | `emojis.py` | All custom emoji IDs -- single source of truth |
 | `footer.py` | Random footer message pool for embeds |
 
@@ -349,7 +409,7 @@ Schema is defined in `src/db/schema.sql` and migrated automatically on startup.
 
 | Table | Purpose |
 |:------|:--------|
-| `users` | Balances, EXP, level, stats, active game flag, daily timestamp |
+| `users` | Balances, EXP, level, global stats, streaks, active game flag, daily timestamp |
 | `blackjack_games` | Active Blackjack game state |
 | `coinflip_games` | Pending delayed Coin Flip games |
 | `lottery_state` | Current draw state and jackpot pool |
@@ -358,6 +418,11 @@ Schema is defined in `src/db/schema.sql` and migrated automatically on startup.
 | `sicbo_state` | Current Sicbo round state |
 | `sicbo_bets` | All bets placed in the current round |
 | `sicbo_announcements` | Announcement channel & message ID references |
+| `baucua_state` | Current Baucua round state |
+| `baucua_bets` | All bets placed in the current Baucua round |
+| `baucua_announcements` | Announcement channel & message ID references |
+| `user_game_stats` | Per-user, per-game wins/losses/draws, streaks, bet, payout, and profit stats |
+| `user_achievements` | Unlocked achievements per user |
 
 > [!NOTE]
 > All writes involving coins, game state, tickets, jackpots, or active game flags use `immediate_transaction` for full atomicity. Coins are never lost during crashes or concurrent updates.

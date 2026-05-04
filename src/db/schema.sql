@@ -9,6 +9,15 @@ CREATE TABLE IF NOT EXISTS users (
     draws INTEGER NOT NULL DEFAULT 0,
     total_games INTEGER NOT NULL DEFAULT 0,
 
+    total_bet INTEGER NOT NULL DEFAULT 0 CHECK (total_bet >= 0),
+    total_payout INTEGER NOT NULL DEFAULT 0 CHECK (total_payout >= 0),
+    net_profit INTEGER NOT NULL DEFAULT 0,
+    achievements_unlocked INTEGER NOT NULL DEFAULT 0 CHECK (achievements_unlocked >= 0),
+    current_win_streak INTEGER NOT NULL DEFAULT 0 CHECK (current_win_streak >= 0),
+    current_loss_streak INTEGER NOT NULL DEFAULT 0 CHECK (current_loss_streak >= 0),
+    best_win_streak INTEGER NOT NULL DEFAULT 0 CHECK (best_win_streak >= 0),
+    best_loss_streak INTEGER NOT NULL DEFAULT 0 CHECK (best_loss_streak >= 0),
+
     has_game INTEGER NOT NULL DEFAULT 0,
     active_game_type TEXT,
     daily_claimed_at INTEGER NOT NULL DEFAULT 0,
@@ -159,3 +168,97 @@ CREATE TABLE IF NOT EXISTS sicbo_announcements (
 );
 
 CREATE INDEX IF NOT EXISTS idx_sicbo_announcements_channel_id ON sicbo_announcements(channel_id);
+
+CREATE TABLE IF NOT EXISTS baucua_state (
+    id INTEGER PRIMARY KEY CHECK (id = 1),
+
+    round_id INTEGER NOT NULL DEFAULT 1,
+    status TEXT NOT NULL DEFAULT 'betting',
+
+    started_at INTEGER NOT NULL,
+    ends_at INTEGER NOT NULL,
+
+    channel_id TEXT,
+    message_id TEXT,
+
+    result_1 TEXT,
+    result_2 TEXT,
+    result_3 TEXT,
+
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS baucua_bets (
+    bet_id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+    round_id INTEGER NOT NULL,
+    user_id TEXT NOT NULL,
+    choice TEXT NOT NULL,
+    amount INTEGER NOT NULL CHECK (amount > 0),
+
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL,
+
+    FOREIGN KEY(user_id) REFERENCES users(user_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_baucua_bets_round_id ON baucua_bets(round_id);
+CREATE INDEX IF NOT EXISTS idx_baucua_bets_user_id ON baucua_bets(user_id);
+CREATE INDEX IF NOT EXISTS idx_baucua_bets_round_choice ON baucua_bets(round_id, choice);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_baucua_bets_round_user_choice ON baucua_bets(round_id, user_id, choice);
+
+CREATE TABLE IF NOT EXISTS baucua_announcements (
+    guild_id TEXT PRIMARY KEY,
+    channel_id TEXT NOT NULL,
+    message_id TEXT,
+
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_baucua_announcements_channel_id ON baucua_announcements(channel_id);
+
+CREATE TABLE IF NOT EXISTS user_game_stats (
+    user_id TEXT NOT NULL,
+    game_type TEXT NOT NULL,
+
+    wins INTEGER NOT NULL DEFAULT 0 CHECK (wins >= 0),
+    losses INTEGER NOT NULL DEFAULT 0 CHECK (losses >= 0),
+    draws INTEGER NOT NULL DEFAULT 0 CHECK (draws >= 0),
+    total_games INTEGER NOT NULL DEFAULT 0 CHECK (total_games >= 0),
+
+    current_win_streak INTEGER NOT NULL DEFAULT 0 CHECK (current_win_streak >= 0),
+    current_loss_streak INTEGER NOT NULL DEFAULT 0 CHECK (current_loss_streak >= 0),
+    best_win_streak INTEGER NOT NULL DEFAULT 0 CHECK (best_win_streak >= 0),
+    best_loss_streak INTEGER NOT NULL DEFAULT 0 CHECK (best_loss_streak >= 0),
+
+    total_bet INTEGER NOT NULL DEFAULT 0 CHECK (total_bet >= 0),
+    total_payout INTEGER NOT NULL DEFAULT 0 CHECK (total_payout >= 0),
+    net_profit INTEGER NOT NULL DEFAULT 0,
+    biggest_bet INTEGER NOT NULL DEFAULT 0 CHECK (biggest_bet >= 0),
+    biggest_win INTEGER NOT NULL DEFAULT 0 CHECK (biggest_win >= 0),
+
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL,
+
+    PRIMARY KEY (user_id, game_type),
+    FOREIGN KEY(user_id) REFERENCES users(user_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_user_game_stats_game_wins ON user_game_stats(game_type, wins);
+CREATE INDEX IF NOT EXISTS idx_user_game_stats_game_profit ON user_game_stats(game_type, net_profit);
+CREATE INDEX IF NOT EXISTS idx_user_game_stats_game_bet ON user_game_stats(game_type, total_bet);
+
+CREATE TABLE IF NOT EXISTS user_achievements (
+    user_id TEXT NOT NULL,
+    achievement_id TEXT NOT NULL,
+    game_type TEXT,
+    unlocked_at INTEGER NOT NULL,
+
+    PRIMARY KEY (user_id, achievement_id),
+    FOREIGN KEY(user_id) REFERENCES users(user_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_user_achievements_user_id ON user_achievements(user_id);
+CREATE INDEX IF NOT EXISTS idx_user_achievements_game_type ON user_achievements(game_type);

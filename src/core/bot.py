@@ -9,17 +9,24 @@ from discord.ext import commands
 from src.config.settings import Settings
 from src.db.connection import Database
 from src.db.migrations import run_migrations
+from src.games.baucua.service import BaucuaService
 from src.games.blackjack.service import BlackjackService
 from src.games.coinflip.service import CoinFlipService
 from src.games.lottery.service import LotteryService
 from src.games.sicbo.service import SicboService
+from src.repositories.baucua_repository import BaucuaRepository
 from src.repositories.blackjack_repository import BlackjackRepository
+from src.repositories.achievement_repository import AchievementRepository
 from src.repositories.coinflip_repository import CoinFlipRepository
+from src.repositories.game_stats_repository import GameStatsRepository
 from src.repositories.lottery_repository import LotteryRepository
 from src.repositories.sicbo_repository import SicboRepository
 from src.repositories.user_repository import UserRepository
 from src.services.daily_reward_service import DailyRewardService
+from src.services.achievement_service import AchievementService
 from src.services.game_lock_service import GameLockService
+from src.services.game_stats_service import GameStatsService
+from src.services.leaderboard_service import LeaderboardService
 
 LOGGER = logging.getLogger(__name__)
 
@@ -37,12 +44,19 @@ class CasinoBot(commands.Bot):
         self.coinflip_repository: CoinFlipRepository | None = None
         self.lottery_repository: LotteryRepository | None = None
         self.sicbo_repository: SicboRepository | None = None
+        self.baucua_repository: BaucuaRepository | None = None
+        self.game_stats_repository: GameStatsRepository | None = None
+        self.achievement_repository: AchievementRepository | None = None
         self.game_locks = GameLockService()
         self.blackjack_service: BlackjackService | None = None
         self.coinflip_service: CoinFlipService | None = None
         self.lottery_service: LotteryService | None = None
         self.sicbo_service: SicboService | None = None
+        self.baucua_service: BaucuaService | None = None
         self.daily_reward_service: DailyRewardService | None = None
+        self.achievement_service: AchievementService | None = None
+        self.game_stats_service: GameStatsService | None = None
+        self.leaderboard_service: LeaderboardService | None = None
 
     async def setup_hook(self) -> None:
         await self.db.connect()
@@ -53,12 +67,19 @@ class CasinoBot(commands.Bot):
         self.coinflip_repository = CoinFlipRepository(self.db)
         self.lottery_repository = LotteryRepository(self.db)
         self.sicbo_repository = SicboRepository(self.db)
+        self.baucua_repository = BaucuaRepository(self.db)
+        self.game_stats_repository = GameStatsRepository(self.db)
+        self.achievement_repository = AchievementRepository(self.db)
+        self.achievement_service = AchievementService(self.achievement_repository, self.user_repository)
+        self.game_stats_service = GameStatsService(self.game_stats_repository, self.user_repository, self.achievement_service)
+        self.leaderboard_service = LeaderboardService(self.user_repository, self.game_stats_repository)
         self.blackjack_service = BlackjackService(
             self.db,
             self.user_repository,
             self.blackjack_repository,
             self.game_locks,
             self.settings.default_coins,
+            self.game_stats_service,
         )
         self.coinflip_service = CoinFlipService(
             self.db,
@@ -67,6 +88,7 @@ class CasinoBot(commands.Bot):
             self.game_locks,
             self.settings.default_coins,
             self,
+            self.game_stats_service,
         )
         self.lottery_service = LotteryService(
             self.db,
@@ -74,6 +96,7 @@ class CasinoBot(commands.Bot):
             self.lottery_repository,
             self.settings.default_coins,
             self,
+            self.game_stats_service,
         )
         self.sicbo_service = SicboService(
             self.db,
@@ -81,6 +104,15 @@ class CasinoBot(commands.Bot):
             self.sicbo_repository,
             self.settings.default_coins,
             self,
+            self.game_stats_service,
+        )
+        self.baucua_service = BaucuaService(
+            self.db,
+            self.user_repository,
+            self.baucua_repository,
+            self.settings.default_coins,
+            self,
+            self.game_stats_service,
         )
         self.daily_reward_service = DailyRewardService(
             self.db,
@@ -96,13 +128,16 @@ class CasinoBot(commands.Bot):
         await self.load_extension("src.games.coinflip.cog")
         await self.load_extension("src.games.lottery.cog")
         await self.load_extension("src.games.sicbo.cog")
+        await self.load_extension("src.games.baucua.cog")
         await self.load_extension("src.cogs.profile")
+        await self.load_extension("src.cogs.leaderboard")
         await self.load_extension("src.cogs.economy")
         await self.load_extension("src.cogs.help")
 
         await self.coinflip_service.recover_pending_games()
         await self.lottery_service.start()
         await self.sicbo_service.start()
+        await self.baucua_service.start()
 
         if self.settings.sync_commands:
             await self.tree.sync()
@@ -115,6 +150,8 @@ class CasinoBot(commands.Bot):
             await self.lottery_service.close()
         if self.sicbo_service is not None:
             await self.sicbo_service.close()
+        if self.baucua_service is not None:
+            await self.baucua_service.close()
         await self.db.close()
         await super().close()
 

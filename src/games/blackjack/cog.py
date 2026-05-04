@@ -8,6 +8,7 @@ from src.core.errors import ActiveGameExistsError, InvalidBetAmountError, NotEno
 from src.games.blackjack.renderer import content_for_player, render_from_action
 from src.games.blackjack.views import BlackjackView
 from src.services.progression_service import ProgressionService
+from src.utils.notifications import combine_notifications
 
 
 class BlackjackCog(commands.Cog):
@@ -48,9 +49,12 @@ class BlackjackCog(commands.Cog):
         if not action.finished:
             await service.save_message(user_id, message.channel.id if message.channel else None, message.id)
         else:
-            level_message = ProgressionService.level_change_message(user_id, action.progression)
-            if level_message is not None:
-                await message.reply(level_message, mention_author=True)
+            notification = combine_notifications(
+                ProgressionService.level_change_message(user_id, action.progression),
+                action.achievement_message,
+            )
+            if notification is not None:
+                await message.reply(notification, mention_author=True)
 
     async def _handle_prefix_bj(self, ctx: commands.Context, amount: int) -> None:
         service = self.bot.blackjack_service  # type: ignore[attr-defined]
@@ -69,9 +73,12 @@ class BlackjackCog(commands.Cog):
         if not action.finished:
             await service.save_message(user_id, message.channel.id if message.channel else None, message.id)
         else:
-            level_message = ProgressionService.level_change_message(user_id, action.progression)
-            if level_message is not None:
-                await message.reply(level_message, mention_author=True)
+            notification = combine_notifications(
+                ProgressionService.level_change_message(user_id, action.progression),
+                action.achievement_message,
+            )
+            if notification is not None:
+                await message.reply(notification, mention_author=True)
 
 
 async def setup(bot: commands.Bot) -> None:

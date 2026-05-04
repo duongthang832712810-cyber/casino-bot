@@ -6,12 +6,13 @@ from src.config import sicbo as sicbo_config
 from src.config.emojis import SICBO_BOWL_ROWS, SICBO_DICE_EMOJIS
 from src.games.sicbo.constants import CHOICE_BIG, CHOICE_DISPLAY, CHOICE_SMALL, STATUS_BETTING
 from src.games.sicbo.models import SicboBet, SicboState
+from src.utils.footer import random_footer_text
 from src.utils.money import format_coin, format_number
 
 ZERO_WIDTH = "\u200b"
 
 
-def render_sicbo_embed(state: SicboState, bets: list[SicboBet]) -> discord.Embed:
+def render_sicbo_embed(state: SicboState, bets: list[SicboBet], bot_name: str | None = None) -> discord.Embed:
     embed = discord.Embed(
         title=f"Sicbo Round #{format_number(state.round_id)}",
         color=0x8E44AD if state.status == STATUS_BETTING else 0x2ECC71,
@@ -24,6 +25,7 @@ def render_sicbo_embed(state: SicboState, bets: list[SicboBet]) -> discord.Embed
     embed.add_field(name="Total Big Bets", value=_choice_field_value(bets, CHOICE_BIG), inline=True)
     embed.add_field(name=ZERO_WIDTH, value=_middle_field_value(state), inline=True)
     embed.add_field(name="Total Small Bets", value=_choice_field_value(bets, CHOICE_SMALL), inline=True)
+    embed.set_footer(text=random_footer_text(bot_name))
     return embed
 
 

@@ -19,10 +19,13 @@ from src.games.coinflip.models import CoinFlipActionResult, CoinFlipGame
 from src.games.coinflip.renderer import render_coinflip_embed
 from src.repositories.coinflip_repository import CoinFlipRepository
 from src.repositories.user_repository import UserRepository
+from src.services.achievement_service import format_achievement_unlocks
 from src.services.exp_service import ExpService
 from src.services.game_lock_service import GameLockService
+from src.services.game_stats_service import GameStatsService
 from src.services.progression_service import ProgressionService
 from src.utils.money import format_coin
+from src.utils.notifications import combine_notifications
 
 LOGGER = logging.getLogger(__name__)
 
@@ -36,6 +39,7 @@ class CoinFlipService:
         locks: GameLockService,
         default_coins: int,
         client: discord.Client,
+        game_stats: GameStatsService,
     ) -> None:
         self.db = db
         self.users = users
@@ -43,6 +47,7 @@ class CoinFlipService:
         self.locks = locks
         self.default_coins = default_coins
         self.client = client
+        self.game_stats = game_stats
         self._tasks: dict[str, asyncio.Task[None]] = {}
 
     async def start_or_resume(self, user_id: str, raw_choice: str, bet_amount: int) -> CoinFlipActionResult:
@@ -137,7 +142,8 @@ class CoinFlipService:
                 existing_game = await self.games.get_by_user_id(user_id)
                 if existing_game is None:
                     raise GameNotFoundError("This Coin Flip has already ended.")
-                progression = await self.users.update_after_result(user_id, payout, exp_delta, result)
+                progression = await self.users.update_after_result(user_id, game.bet_amount, payout, exp_delta, result)
+                stats_result = await self.game_stats.record_result(user_id, GAME_COINFLIP, result, game.bet_amount, payout)
                 await self.games.delete(user_id)
 
             return CoinFlipActionResult(
@@ -150,6 +156,7 @@ class CoinFlipService:
                 net=net,
                 exp_delta=exp_delta,
                 progression=progression,
+                achievement_message=format_achievement_unlocks(user_id, stats_result.achievements),
             )
 
     async def _edit_result_message(self, action: CoinFlipActionResult) -> None:
@@ -173,9 +180,12 @@ class CoinFlipService:
             )
             content = COINFLIP_HEADS_EMOJI if action.outcome == CHOICE_HEADS else COINFLIP_TAILS_EMOJI
             await message.edit(content=content, embed=embed)
-            level_message = ProgressionService.level_change_message(game.user_id, action.progression)
-            if level_message is not None:
-                await message.reply(level_message, mention_author=False)
+            notification = combine_notifications(
+                ProgressionService.level_change_message(game.user_id, action.progression),
+                action.achievement_message,
+            )
+            if notification is not None:
+                await message.reply(notification, mention_author=False)
         except Exception:
             LOGGER.exception("Failed to edit coinflip result message for user_id=%s", game.user_id)
 

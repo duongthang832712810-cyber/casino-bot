@@ -30,13 +30,13 @@ class LotteryCog(commands.Cog):
     async def slash_tickets(self, interaction: discord.Interaction) -> None:
         service = self.bot.lottery_service  # type: ignore[attr-defined]
         state, tickets = await service.get_user_tickets(str(interaction.user.id))
-        await interaction.response.send_message(embed=render_user_tickets_embed(state, tickets, interaction.user), ephemeral=True)
+        await interaction.response.send_message(embed=render_user_tickets_embed(state, tickets, interaction.user, _bot_name(self.bot)), ephemeral=True)
 
     @lottery.command(name="info", description="View current round information.")
     async def slash_info(self, interaction: discord.Interaction) -> None:
         service = self.bot.lottery_service  # type: ignore[attr-defined]
         state = await service.get_state()
-        await interaction.response.send_message(embed=render_announcement_embed(state), ephemeral=True)
+        await interaction.response.send_message(embed=render_announcement_embed(state, _bot_name(self.bot)), ephemeral=True)
 
     @lottery.command(name="set", description="Set the announcement channel.")
     @app_commands.describe(channel="Announcement channel")
@@ -66,13 +66,13 @@ class LotteryCog(commands.Cog):
     async def prefix_tickets(self, ctx: commands.Context) -> None:
         service = self.bot.lottery_service  # type: ignore[attr-defined]
         state, tickets = await service.get_user_tickets(str(ctx.author.id))
-        await ctx.reply(embed=render_user_tickets_embed(state, tickets, ctx.author), mention_author=True)
+        await ctx.reply(embed=render_user_tickets_embed(state, tickets, ctx.author, _bot_name(self.bot)), mention_author=True)
 
     @prefix_lottery.command(name="info")
     async def prefix_info(self, ctx: commands.Context) -> None:
         service = self.bot.lottery_service  # type: ignore[attr-defined]
         state = await service.get_state()
-        await ctx.reply(embed=render_announcement_embed(state), mention_author=True)
+        await ctx.reply(embed=render_announcement_embed(state, _bot_name(self.bot)), mention_author=True)
 
     @prefix_lottery.command(name="set")
     @commands.has_guild_permissions(administrator=True)
@@ -119,6 +119,10 @@ class LotteryCog(commands.Cog):
             await ctx.reply(str(exc), mention_author=True)
             return
         await ctx.reply(_purchase_message(result), mention_author=True)
+
+
+def _bot_name(bot: commands.Bot) -> str | None:
+    return bot.user.display_name if bot.user is not None else None
 
 
 def _purchase_message(result) -> str:

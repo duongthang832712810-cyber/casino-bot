@@ -20,7 +20,18 @@ async def _ensure_users_columns(db: Database) -> None:
         rows = await cursor.fetchall()
     column_names = {row[1] for row in rows}
 
-    if "daily_claimed_at" not in column_names:
-        await conn.execute("ALTER TABLE users ADD COLUMN daily_claimed_at INTEGER NOT NULL DEFAULT 0")
-    if "level" not in column_names:
-        await conn.execute("ALTER TABLE users ADD COLUMN level INTEGER NOT NULL DEFAULT 0 CHECK (level >= 0)")
+    columns: dict[str, str] = {
+        "daily_claimed_at": "INTEGER NOT NULL DEFAULT 0",
+        "level": "INTEGER NOT NULL DEFAULT 0 CHECK (level >= 0)",
+        "total_bet": "INTEGER NOT NULL DEFAULT 0 CHECK (total_bet >= 0)",
+        "total_payout": "INTEGER NOT NULL DEFAULT 0 CHECK (total_payout >= 0)",
+        "net_profit": "INTEGER NOT NULL DEFAULT 0",
+        "achievements_unlocked": "INTEGER NOT NULL DEFAULT 0 CHECK (achievements_unlocked >= 0)",
+        "current_win_streak": "INTEGER NOT NULL DEFAULT 0 CHECK (current_win_streak >= 0)",
+        "current_loss_streak": "INTEGER NOT NULL DEFAULT 0 CHECK (current_loss_streak >= 0)",
+        "best_win_streak": "INTEGER NOT NULL DEFAULT 0 CHECK (best_win_streak >= 0)",
+        "best_loss_streak": "INTEGER NOT NULL DEFAULT 0 CHECK (best_loss_streak >= 0)",
+    }
+    for column_name, definition in columns.items():
+        if column_name not in column_names:
+            await conn.execute(f"ALTER TABLE users ADD COLUMN {column_name} {definition}")

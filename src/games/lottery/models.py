@@ -58,3 +58,4 @@ class LotteryDrawResult:
     jackpot_winners: int
     total_payout: int
     jackpot_hit: bool
+    achievement_messages: list[str] | None = None

@@ -10,6 +10,7 @@ from math import floor
 import discord
 
 from src.config import lottery as lottery_config
+from src.core.constants import GAME_LOTTERY, RESULT_LOSE, RESULT_WIN
 from src.core.errors import ActiveGameExistsError, BotError, InvalidBetAmountError, NotEnoughCoinsError
 from src.db.connection import Database
 from src.db.transaction import immediate_transaction
@@ -18,6 +19,8 @@ from src.games.lottery.models import LotteryDrawResult, LotteryPurchaseResult, L
 from src.games.lottery.renderer import render_announcement_embed, render_draw_result_embed
 from src.repositories.lottery_repository import LotteryRepository
 from src.repositories.user_repository import UserRepository
+from src.services.achievement_service import format_achievement_unlocks
+from src.services.game_stats_service import GameStatsService
 from src.utils.money import format_coin, format_number
 
 LOGGER = logging.getLogger(__name__)
@@ -35,12 +38,14 @@ class LotteryService:
         lottery: LotteryRepository,
         default_coins: int,
         client: discord.Client,
+        game_stats: GameStatsService,
     ) -> None:
         self.db = db
         self.users = users
         self.lottery = lottery
         self.default_coins = default_coins
         self.client = client
+        self.game_stats = game_stats
         self._lock = asyncio.Lock()
         self._task: asyncio.Task[None] | None = None
 
@@ -139,7 +144,7 @@ class LotteryService:
             old_announcement = await self.lottery.get_announcement(str(guild_id))
             if old_announcement is not None:
                 await self._delete_announcement(old_announcement.channel_id, old_announcement.message_id)
-            message = await channel.send(embed=render_announcement_embed(state))
+            message = await channel.send(embed=render_announcement_embed(state, self._bot_name()))
             async with immediate_transaction(self.db):
                 await self.lottery.upsert_announcement(str(guild_id), str(channel_id), str(message.id))
 
@@ -153,9 +158,9 @@ class LotteryService:
                 channel = self.client.get_channel(int(announcement.channel_id)) or await self.client.fetch_channel(int(announcement.channel_id))
                 if announcement.message_id:
                     message = await channel.fetch_message(int(announcement.message_id))  # type: ignore[attr-defined]
-                    await message.edit(embed=render_announcement_embed(state))
+                    await message.edit(embed=render_announcement_embed(state, self._bot_name()))
                     continue
-                message = await channel.send(embed=render_announcement_embed(state))  # type: ignore[attr-defined]
+                message = await channel.send(embed=render_announcement_embed(state, self._bot_name()))  # type: ignore[attr-defined]
                 async with immediate_transaction(self.db):
                     await self.lottery.update_announcement_message(announcement.guild_id, str(message.id))
             except Exception:
@@ -183,6 +188,7 @@ class LotteryService:
             result = await self._resolve_current_draw(state)
 
         await self._replace_announcement_with_result(result)
+        await self._send_achievement_messages(result)
         return result
 
     async def _resolve_current_draw(self, state: LotteryState) -> LotteryDrawResult:
@@ -200,8 +206,11 @@ class LotteryService:
             jackpot_winners = 0
             fixed_payouts: dict[str, int] = {}
             jackpot_quantities: dict[str, int] = {}
+            user_costs: dict[str, int] = {}
+            achievement_messages: list[str] = []
 
             for ticket in tickets:
+                user_costs[ticket.user_id] = user_costs.get(ticket.user_id, 0) + lottery_config.TICKET_PRICE * ticket.quantity
                 matched = self._matched_digits(ticket.number, winning_number)
                 if matched == 4:
                     jackpot_winners += ticket.quantity
@@ -223,9 +232,14 @@ class LotteryService:
                     fixed_payouts[user_id] = fixed_payouts.get(user_id, 0) + payout
                     total_payout += payout
 
-            for user_id, payout in fixed_payouts.items():
-                if payout > 0:
-                    await self.users.add_coins(user_id, payout)
+            for user_id, cost in user_costs.items():
+                payout = fixed_payouts.get(user_id, 0)
+                result = RESULT_WIN if payout > 0 else RESULT_LOSE
+                await self.users.update_after_result(user_id, cost, payout, 0, result, clear_active_game=False)
+                stats_result = await self.game_stats.record_result(user_id, GAME_LOTTERY, result, cost, payout)
+                message = format_achievement_unlocks(user_id, stats_result.achievements)
+                if message is not None:
+                    achievement_messages.append(message)
 
             now = int(time.time())
             await self.lottery.reset_for_next_draw(
@@ -246,6 +260,7 @@ class LotteryService:
                 jackpot_winners=jackpot_winners,
                 total_payout=total_payout,
                 jackpot_hit=jackpot_hit,
+                achievement_messages=achievement_messages,
             )
 
     async def _replace_announcement_with_result(self, result: LotteryDrawResult) -> None:
@@ -254,16 +269,39 @@ class LotteryService:
             return
         announcements = await self.lottery.list_announcements()
         for announcement in announcements:
-            await self._delete_announcement(announcement.channel_id, announcement.message_id)
             try:
                 channel = self.client.get_channel(int(announcement.channel_id)) or await self.client.fetch_channel(int(announcement.channel_id))
-                if result.tickets_sold > 0:
-                    await channel.send(embed=render_draw_result_embed(result))  # type: ignore[attr-defined]
-                message = await channel.send(embed=render_announcement_embed(state))  # type: ignore[attr-defined]
+                result_embed = render_draw_result_embed(result, self._bot_name())
+                if announcement.message_id:
+                    try:
+                        old_message = await channel.fetch_message(int(announcement.message_id))  # type: ignore[attr-defined]
+                        await old_message.edit(embed=result_embed)
+                    except Exception as exc:
+                        LOGGER.warning("Failed to edit old Lottery announcement into result: %s", exc)
+                        await channel.send(embed=result_embed)  # type: ignore[attr-defined]
+                else:
+                    await channel.send(embed=result_embed)  # type: ignore[attr-defined]
+
+                message = await channel.send(embed=render_announcement_embed(state, self._bot_name()))  # type: ignore[attr-defined]
                 async with immediate_transaction(self.db):
                     await self.lottery.update_announcement_message(announcement.guild_id, str(message.id))
             except Exception:
                 LOGGER.exception("Failed to replace lottery announcement for guild_id=%s", announcement.guild_id)
+
+    async def _send_achievement_messages(self, result: LotteryDrawResult) -> None:
+        if not result.achievement_messages:
+            return
+        announcements = await self.lottery.list_announcements()
+        content = "\n".join(result.achievement_messages)
+        for announcement in announcements:
+            try:
+                channel = self.client.get_channel(int(announcement.channel_id)) or await self.client.fetch_channel(int(announcement.channel_id))
+                await channel.send(content)  # type: ignore[attr-defined]
+            except Exception:
+                LOGGER.exception("Failed to send Lottery achievement messages for guild_id=%s", announcement.guild_id)
+
+    def _bot_name(self) -> str | None:
+        return self.client.user.display_name if self.client.user is not None else None
 
     async def _delete_announcement(self, channel_id: str | None, message_id: str | None) -> None:
         if not channel_id or not message_id:
@@ -272,8 +310,8 @@ class LotteryService:
             channel = self.client.get_channel(int(channel_id)) or await self.client.fetch_channel(int(channel_id))
             message = await channel.fetch_message(int(message_id))  # type: ignore[attr-defined]
             await message.delete()
-        except Exception:
-            LOGGER.warning("Failed to delete old lottery announcement", exc_info=True)
+        except Exception as exc:
+            LOGGER.warning("Failed to delete old lottery announcement: %s", exc)
 
     @staticmethod
     def normalize_number(raw_number: str) -> str:

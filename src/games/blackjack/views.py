@@ -15,6 +15,7 @@ from src.core.errors import GameNotFoundError, NotEnoughCoinsError
 from src.games.blackjack.constants import CUSTOM_ID_PREFIX
 from src.games.blackjack.renderer import content_for_player, render_from_action
 from src.services.progression_service import ProgressionService
+from src.utils.notifications import combine_notifications
 
 
 class BlackjackView(discord.ui.View):
@@ -68,9 +69,12 @@ class BlackjackView(discord.ui.View):
         view = discord.ui.View() if action.finished else BlackjackView(self.user_id)
         content = content_for_player(self.user_id, action.finished)
         await interaction.response.edit_message(content=content, embed=embed, view=view)
-        level_message = ProgressionService.level_change_message(self.user_id, action.progression)
-        if level_message is not None and interaction.message is not None:
-            await interaction.message.reply(level_message, mention_author=False)
+        notification = combine_notifications(
+            ProgressionService.level_change_message(self.user_id, action.progression),
+            action.achievement_message,
+        )
+        if notification is not None and interaction.message is not None:
+            await interaction.message.reply(notification, mention_author=False)
 
 
 def _current_footer_text(interaction: discord.Interaction) -> str | None:

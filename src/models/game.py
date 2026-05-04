@@ -8,6 +8,7 @@ class GameType(str, Enum):
     COINFLIP = "coinflip"
     LOTTERY = "lottery"
     SICBO = "sicbo"
+    BAUCUA = "baucua"
 
 
 class GameResult(str, Enum):

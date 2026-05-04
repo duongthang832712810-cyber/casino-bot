@@ -28,3 +28,4 @@ class CoinFlipActionResult:
     net: int = 0
     exp_delta: int = 0
     progression: ProgressionUpdate | None = None
+    achievement_message: str | None = None

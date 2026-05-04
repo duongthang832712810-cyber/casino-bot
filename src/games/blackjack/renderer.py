@@ -43,9 +43,8 @@ def render_blackjack_embed(
     )
     embed.add_field(name=ZERO_WIDTH, value=f"{player_symbol_line}\n{dealer_symbol_line}", inline=True)
 
-    footer = footer_text or random_footer_text()
     footer_icon_url = _footer_icon_url(finished, result)
-    embed.set_footer(text=footer, icon_url=footer_icon_url)
+    embed.set_footer(text=footer_text or random_footer_text(), icon_url=footer_icon_url)
     return embed
 
 
