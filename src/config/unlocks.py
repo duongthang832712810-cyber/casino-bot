@@ -1,0 +1,24 @@
+FEATURE_BLACKJACK = "blackjack"
+FEATURE_COINFLIP = "coinflip"
+FEATURE_LOTTERY = "lottery"
+FEATURE_SICBO = "sicbo"
+FEATURE_BAUCUA = "baucua"
+FEATURE_MINING = "mining"
+
+FEATURE_NAMES = {
+    FEATURE_BLACKJACK: "Blackjack",
+    FEATURE_COINFLIP: "Coin Flip",
+    FEATURE_LOTTERY: "Lottery",
+    FEATURE_SICBO: "Sicbo",
+    FEATURE_BAUCUA: "Baucua",
+    FEATURE_MINING: "Lucky Mining",
+}
+
+REQUIRED_LEVELS = {
+    FEATURE_BLACKJACK: 0,
+    FEATURE_COINFLIP: 0,
+    FEATURE_LOTTERY: 0,
+    FEATURE_SICBO: 0,
+    FEATURE_BAUCUA: 0,
+    FEATURE_MINING: 30,
+}

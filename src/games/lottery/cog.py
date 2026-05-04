@@ -100,7 +100,7 @@ class LotteryCog(commands.Cog):
         except (ActiveGameExistsError, InvalidBetAmountError, LotteryDrawClosedError, NotEnoughCoinsError) as exc:
             await interaction.response.send_message(str(exc), ephemeral=True)
             return
-        await interaction.response.send_message(_purchase_message(result), ephemeral=True)
+        await interaction.response.send_message(_random_purchase_message(result), ephemeral=True)
 
     async def _handle_prefix_buy(self, ctx: commands.Context, number: str, quantity: int) -> None:
         service = self.bot.lottery_service  # type: ignore[attr-defined]
@@ -118,7 +118,7 @@ class LotteryCog(commands.Cog):
         except (ActiveGameExistsError, InvalidBetAmountError, LotteryDrawClosedError, NotEnoughCoinsError) as exc:
             await ctx.reply(str(exc), mention_author=True)
             return
-        await ctx.reply(_purchase_message(result), mention_author=True)
+        await ctx.reply(_random_purchase_message(result), mention_author=True)
 
 
 def _bot_name(bot: commands.Bot) -> str | None:
@@ -133,6 +133,10 @@ def _purchase_message(result) -> str:
         f"Bought {format_number(result.total_quantity)} Lottery ticket(s) for {format_coin(result.total_cost)}. "
         f"Numbers: {number_text}"
     )
+
+
+def _random_purchase_message(result) -> str:
+    return f"Bought {format_number(result.total_quantity)} Lottery ticket(s) for {format_coin(result.total_cost)}."
 
 
 async def setup(bot: commands.Bot) -> None:

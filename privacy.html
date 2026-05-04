@@ -520,7 +520,7 @@ h1, h2, h3, h4, .font-display {
     <div class="doc-hero__meta">
       <div class="doc-hero__meta-cell">
         <div class="doc-hero__meta-label">Effective Date</div>
-        <div class="doc-hero__meta-val">May 3, 2026</div>
+        <div class="doc-hero__meta-val">May 4, 2026</div>
       </div>
       <div class="doc-hero__meta-cell">
         <div class="doc-hero__meta-label">Service</div>
@@ -542,13 +542,13 @@ h1, h2, h3, h4, .font-display {
 <div class="notice-ticker" aria-label="Privacy notice">
   <div class="notice-ticker__track">
     <span class="notice-ticker__item">We do not sell your data</span>
-    <span class="notice-ticker__item">Only Discord IDs and virtual game data are stored</span>
+    <span class="notice-ticker__item">Only Discord IDs and virtual economy/game data are stored</span>
     <span class="notice-ticker__item">You can request data deletion at any time</span>
     <span class="notice-ticker__item">We do not sell your data</span>
-    <span class="notice-ticker__item">Only Discord IDs and virtual game data are stored</span>
+    <span class="notice-ticker__item">Only Discord IDs and virtual economy/game data are stored</span>
     <span class="notice-ticker__item">You can request data deletion at any time</span>
     <span class="notice-ticker__item">We do not sell your data</span>
-    <span class="notice-ticker__item">Only Discord IDs and virtual game data are stored</span>
+    <span class="notice-ticker__item">Only Discord IDs and virtual economy/game data are stored</span>
     <span class="notice-ticker__item">You can request data deletion at any time</span>
   </div>
 </div>
@@ -589,7 +589,7 @@ h1, h2, h3, h4, .font-display {
       <div class="kp-cell kp-cell--dark">
         <div class="kp-cell__id">GL-01</div>
         <div class="kp-cell__title">Minimal<br>Data</div>
-        <div class="kp-cell__text">Only Discord IDs and game-related virtual data are stored. Nothing else.</div>
+        <div class="kp-cell__text">Only Discord IDs and bot-related virtual economy/game data are stored. Nothing else.</div>
       </div>
       <div class="kp-cell kp-cell--safety">
         <div class="kp-cell__id">GL-02</div>
@@ -611,7 +611,7 @@ h1, h2, h3, h4, .font-display {
         <span class="doc-section__tag">Read This First</span>
       </div>
       <div class="doc-section__body">
-        <p>LuckyBot+ stores a limited set of Discord identifiers and virtual game data necessary to operate its economy, player profiles, casino-style games, lottery system, announcements, and server configuration features. No real personal information beyond what Discord already stores about you is collected. We do not sell, rent, share, or commercialize your data in any form. You can request deletion of your data at any time by contacting the bot owner.</p>
+        <p>LuckyBot+ stores a limited set of Discord identifiers and virtual economy/game data necessary to operate balances, daily rewards, profiles, achievements, leaderboards, Blackjack, Coin Flip, Lottery, Sicbo, Baucua, Lucky Mining, announcements, and server configuration features. No real personal information beyond Discord identifiers needed by the bot is intentionally collected. We do not sell, rent, share, or commercialize your data in any form. You can request deletion of your data at any time by contacting the bot owner.</p>
       </div>
     </div>
 
@@ -642,38 +642,86 @@ h1, h2, h3, h4, .font-display {
             <tbody>
               <tr>
                 <td class="td-label">Discord User ID</td>
-                <td>Numeric Discord user identifier</td>
-                <td>To maintain balances, EXP, statistics, game states, and profiles per user.</td>
+                <td>Numeric Discord user identifier for users who interact with the bot.</td>
+                <td>To create one profile per user, store balances, EXP, levels, daily reward cooldowns, active game flags, game states, achievements, mining computers, and statistics.</td>
                 <td><span class="td-tag">Yes</span></td>
               </tr>
               <tr>
                 <td class="td-label">Discord Guild ID</td>
-                <td>Numeric Discord server identifier</td>
-                <td>To store server-specific announcement channel settings and server configuration.</td>
+                <td>Numeric Discord server identifier for servers using global announcement features.</td>
+                <td>To store server-specific Lottery, Sicbo, and Baucua announcement channel configuration.</td>
                 <td><span class="td-tag">Yes</span></td>
               </tr>
               <tr>
                 <td class="td-label">Channel & Message IDs</td>
-                <td>Channel ID, Message ID</td>
-                <td>To send, edit, recover, or replace game announcement embeds and result messages.</td>
+                <td>Channel ID, message ID, and references to bot-created game messages.</td>
+                <td>To send, edit, recover, replace, or delete bot announcement embeds and result messages after restarts or scheduled events.</td>
                 <td><span class="td-tag">Yes</span></td>
               </tr>
               <tr>
-                <td class="td-label">Virtual Economy Data</td>
-                <td>Coin balance, EXP, win/loss/draw counts, total games played</td>
-                <td>To operate the player economy, profile statistics, and leaderboard features.</td>
+                <td class="td-label">User Economy Profile</td>
+                <td>Coin balance, EXP, level, daily_claimed_at, created_at, updated_at.</td>
+                <td>To operate profiles, profile commands, daily rewards, economy commands, transfers, and progression displays.</td>
                 <td><span class="td-tag">Yes</span></td>
               </tr>
               <tr>
-                <td class="td-label">Active Game Data</td>
-                <td>Game type, Blackjack card state, Coin Flip choice, Lottery tickets held, Sicbo bets placed</td>
-                <td>To run games, resolve outcomes, prevent duplicate active sessions, and recover game state after bot restarts.</td>
+                <td class="td-label">Aggregate User Stats</td>
+                <td>Wins, losses, draws, total games, total bet, total payout, net profit, achievements unlocked, current/best win and loss streaks.</td>
+                <td>To show profile totals, leaderboards, and long-term virtual progression.</td>
+                <td><span class="td-tag">Yes</span></td>
+              </tr>
+              <tr>
+                <td class="td-label">Per-Game Statistics</td>
+                <td>Per-game wins, losses, draws, total games, streaks, total bet, total payout, net profit, biggest bet, biggest win.</td>
+                <td>To support game-specific leaderboards, achievements, statistics, balancing, and profile features.</td>
+                <td><span class="td-tag">Yes</span></td>
+              </tr>
+              <tr>
+                <td class="td-label">Achievement Data</td>
+                <td>Achievement ID, optional game type, unlock timestamp.</td>
+                <td>To prevent duplicate unlocks and display achievement progress or leaderboard categories.</td>
+                <td><span class="td-tag">Yes</span></td>
+              </tr>
+              <tr>
+                <td class="td-label">Blackjack Game Data</td>
+                <td>User ID, bet amount, player cards, dealer cards, deck state, channel ID, message ID, timestamps.</td>
+                <td>To render the active game, handle Hit/Stand/Double actions, resolve payouts, and recover the game if the bot restarts.</td>
+                <td><span class="td-tag">Active</span></td>
+              </tr>
+              <tr>
+                <td class="td-label">Coin Flip Game Data</td>
+                <td>User ID, bet amount, heads/tails choice, resolve_at timestamp, channel ID, message ID, timestamps.</td>
+                <td>To schedule delayed resolution, edit the original flip message, resolve payouts, and recover pending flips after restart.</td>
+                <td><span class="td-tag">Active</span></td>
+              </tr>
+              <tr>
+                <td class="td-label">Lottery State & Tickets</td>
+                <td>Draw ID, status, jackpot pool, started/ends timestamps, tickets sold, participants, last draw result, per-user ticket numbers and quantities.</td>
+                <td>To process ticket purchases, display current draw info, resolve scheduled draws, pay winners, update announcements, and show current tickets.</td>
+                <td><span class="td-tag">Draw</span></td>
+              </tr>
+              <tr>
+                <td class="td-label">Sicbo Round Data</td>
+                <td>Round ID, status, started/ends timestamps, channel/message IDs, dice results, user bet choice, bet amount, timestamps.</td>
+                <td>To manage global Big/Small rounds, close betting, resolve dice results, pay winners, and update announcement messages.</td>
+                <td><span class="td-tag">Round</span></td>
+              </tr>
+              <tr>
+                <td class="td-label">Baucua Round Data</td>
+                <td>Round ID, status, started/ends timestamps, channel/message IDs, three result symbols, user symbol choices, bet amounts, timestamps.</td>
+                <td>To manage global symbol betting rounds, close betting, resolve results, pay matching choices, and update announcement messages.</td>
+                <td><span class="td-tag">Round</span></td>
+              </tr>
+              <tr>
+                <td class="td-label">Lucky Mining Data</td>
+                <td>Computer ID, owner user ID, tier, purchase price, purchased_at, last_claimed_at, total claimed, computers bought, highest tier, claim cooldown timestamp.</td>
+                <td>To calculate stored virtual coins, enforce computer limits, display owned computers, price same-tier purchases, and process claims.</td>
                 <td><span class="td-tag">Yes</span></td>
               </tr>
               <tr>
                 <td class="td-label">Operational Logs</td>
-                <td>Error messages, command failure timestamps, stack traces</td>
-                <td>To debug issues, maintain bot security, and improve reliability over time.</td>
+                <td>Error messages, exception tracebacks, startup/shutdown events, command failure context, Discord API failure details.</td>
+                <td>To debug issues, recover service state, maintain security, investigate abuse, and improve reliability over time.</td>
                 <td><span class="td-tag">Temporary</span></td>
               </tr>
             </tbody>
@@ -695,7 +743,7 @@ h1, h2, h3, h4, .font-display {
           <li>Payment information, financial data, bank account numbers, or credit card details.</li>
           <li>Government-issued identification, real names, physical addresses, or personally identifiable information (PII) beyond Discord's internal numeric IDs.</li>
           <li>Email addresses — you are never required to provide an email to use this bot.</li>
-          <li>Message content, private messages, or the contents of any Discord channels (the bot only reads commands directed at it).</li>
+          <li>General message content, private messages, or the contents of Discord channels. For prefix commands, the bot may receive and process the command message text needed to execute that command, but it does not intentionally store general chat logs.</li>
           <li>Device information, IP addresses, browser fingerprints, or geolocation data.</li>
           <li>Real money, cryptocurrency, or any financial transaction data.</li>
           <li>Information about users who never interact directly with the bot via commands.</li>
@@ -718,14 +766,17 @@ h1, h2, h3, h4, .font-display {
       <div class="doc-section__body">
         <p>All collected data is used exclusively for operating the bot's features. Specifically, stored data is used to:</p>
         <ul>
-          <li>Create and maintain individual player profiles, virtual balances, experience points, and statistics.</li>
-          <li>Start, save, resume, and resolve casino-style game sessions for users across bot restarts.</li>
-          <li>Enforce one-active-game-per-user rules and prevent exploitation of the economy system.</li>
-          <li>Manage and distribute lottery tickets and process scheduled lottery draws.</li>
-          <li>Send, edit, and recover Discord embed messages and game result announcements in configured channels.</li>
-          <li>Maintain server-specific configuration such as designated announcement channels.</li>
-          <li>Respond to support and abuse inquiries, investigate reported bugs, and diagnose operational errors.</li>
-          <li>Detect and prevent abuse, exploitation, cheating, or violations of these Terms.</li>
+          <li>Create and maintain individual player profiles, virtual balances, experience points, levels, achievements, current ticket counts, and statistics.</li>
+          <li>Process economy commands such as balance/profile views, daily rewards, virtual coin transfers, and leaderboard ranking.</li>
+          <li>Start, save, resume, and resolve Blackjack, Coin Flip, Lottery, Sicbo, and Baucua activity across bot restarts where applicable.</li>
+          <li>Enforce one-active-game-per-user rules for active single-player games and prevent duplicate unresolved sessions.</li>
+          <li>Subtract bets or purchases, calculate payouts, update virtual balances, update EXP/stats, and record per-game results atomically.</li>
+          <li>Manage and distribute lottery tickets, process scheduled lottery draws, update jackpot pools, pay winners, and clear per-draw ticket records after each draw.</li>
+          <li>Track Lucky Mining computer ownership, same-tier purchase counts, last claim timestamps, deterministic virtual coin generation, and claim cooldowns.</li>
+          <li>Send, edit, delete, and recover Discord embed messages and game result announcements in configured channels.</li>
+          <li>Maintain server-specific configuration such as designated Lottery, Sicbo, and Baucua announcement channels.</li>
+          <li>Respond to support and abuse inquiries, investigate reported bugs, diagnose operational errors, and restore service after restart or Discord API failures.</li>
+          <li>Detect and prevent abuse, exploitation, cheating, automation, command spam, or violations of these Terms.</li>
         </ul>
         <p>Data is never used for advertising, profiling, marketing, or any purpose unrelated to operating the bot.</p>
       </div>
@@ -738,10 +789,10 @@ h1, h2, h3, h4, .font-display {
         <span class="doc-section__tag">Infrastructure</span>
       </div>
       <div class="doc-section__body">
-        <p>Bot data is stored in a database controlled and maintained by the bot owner. The following technical measures are applied to protect stored data:</p>
+        <p>Bot data is stored in a SQLite database controlled and maintained by the bot owner. The bot uses this database as the source of truth for balances, active games, global rounds, tickets, mining computers, achievements, and configuration. The following technical measures are applied to protect stored data:</p>
         <ul>
           <li>Access to the database is restricted to authorized bot processes and the bot owner only.</li>
-          <li>Database credentials and connection strings are stored securely and are never exposed publicly.</li>
+          <li>Bot tokens, environment variables, database paths, and operational secrets are stored outside public user-facing pages and should never be exposed publicly.</li>
           <li>The server and database software are kept up to date to mitigate known security vulnerabilities.</li>
           <li>Operational logs containing sensitive debug information are retained for a limited period and are not publicly accessible.</li>
         </ul>
@@ -782,18 +833,23 @@ h1, h2, h3, h4, .font-display {
       <div class="doc-section__body">
         <h4>// Persistent Data</h4>
         <ul>
-          <li>Player profiles, virtual economy balances, experience points, and lifetime statistics are retained while the bot continues to provide services and the user's data has not been requested for deletion.</li>
-          <li>Server configuration data (announcement channels, settings) is retained for as long as the bot remains active in the server.</li>
+          <li>User profile rows, coin balance, EXP, level, daily reward timestamp, aggregate stats, per-game stats, achievement unlocks, Lucky Mining computers, and mining stats are retained while the bot continues to provide services and the user's data has not been requested for deletion.</li>
+          <li>Server configuration data, including announcement channel and message IDs for Lottery, Sicbo, and Baucua, is retained for as long as the bot remains active in the server or until an administrator changes/removes the configuration.</li>
+          <li>Leaderboard data is derived from persistent profile, stats, achievement, and economy rows.</li>
         </ul>
-        <h4>// Temporary Data</h4>
+        <h4>// Temporary / Cyclical Data</h4>
         <ul>
-          <li>Active game session data (card states, bets, choices) is deleted automatically after the game resolves or the session expires.</li>
-          <li>Lottery ticket records are cleared after each lottery draw cycle completes.</li>
+          <li>Blackjack active game rows are deleted when the game resolves, is cleared, or is otherwise ended by service logic.</li>
+          <li>Coin Flip pending rows are deleted after the delayed result resolves and the payout/stat update is completed.</li>
+          <li>Sicbo and Baucua round/bet data is retained for the active or current round as needed for betting, display, payout, and result resolution.</li>
+          <li>Lottery ticket records are cleared after each lottery draw cycle completes; the lightweight Lottery state keeps only current draw state and limited last-draw summary fields.</li>
+          <li>Channel/message references for announcements may be replaced when the bot sends a new announcement message.</li>
           <li>Operational logs and error traces are retained for a limited time (typically 30–90 days) for debugging and security review, then purged.</li>
         </ul>
         <h4>// Extended Retention</h4>
         <ul>
-          <li>Some data may be retained beyond standard periods if necessary to investigate active abuse cases, resolve ongoing disputes, or comply with applicable legal obligations.</li>
+          <li>Some data may be retained beyond standard periods if necessary to investigate active abuse cases, recover from data corruption, resolve ongoing disputes, reverse exploit gains, or comply with applicable legal obligations.</li>
+          <li>Backups, if maintained, may retain older copies of data for a limited period before rotation. Deletion from backups may occur on the normal backup lifecycle rather than instantly.</li>
         </ul>
       </div>
     </div>
@@ -807,10 +863,10 @@ h1, h2, h3, h4, .font-display {
       <div class="doc-section__body">
         <p>Depending on your jurisdiction, you may have certain rights regarding your personal data. We respect these rights and will honor valid requests to the best of our ability:</p>
         <ul>
-          <li><strong>Right to access:</strong> You can request a summary of what data the bot holds associated with your Discord User ID.</li>
-          <li><strong>Right to deletion:</strong> You can request that your bot-related data (profile, balance, game history) be deleted by contacting the bot owner. Note that some data may be temporarily retained if needed for active security investigations or ongoing game resolution.</li>
-          <li><strong>Right to correction:</strong> If you believe data associated with your account is inaccurate, you may request a review.</li>
-          <li><strong>Right to restriction:</strong> You may request that we stop processing your data in certain ways while a deletion or correction request is pending.</li>
+          <li><strong>Right to access:</strong> You can request a summary of bot database data associated with your Discord User ID, including profile, stats, achievements, tickets, active game rows, and mining data where applicable.</li>
+          <li><strong>Right to deletion:</strong> You can request that your bot-related data (profile, balance, achievements, game history, tickets, mining computers, stats, and active states) be deleted by contacting the bot owner. Note that some data may be temporarily retained if needed for active security investigations, abuse review, ongoing game resolution, dispute handling, or legal compliance.</li>
+          <li><strong>Right to correction:</strong> If you believe data associated with your account is inaccurate because of a bug, outage, or command error, you may request a review. Virtual balances and game outcomes are not guaranteed to be changed unless the bot owner determines correction is appropriate.</li>
+          <li><strong>Right to restriction:</strong> You may request that we stop processing your data in certain ways while a deletion or correction request is pending, subject to technical feasibility and abuse-prevention needs.</li>
         </ul>
         <p>Server owners may additionally request removal of their server's configuration and guild-level data by contacting the bot owner and confirming their ownership of the relevant server.</p>
         <p>To exercise any of these rights, please contact the bot owner using the contact information provided in Section 12. We aim to respond to all valid requests within 30 days.</p>

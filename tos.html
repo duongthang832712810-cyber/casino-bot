@@ -565,7 +565,7 @@ h1, h2, h3, h4, .font-display {
     <div class="doc-hero__meta">
       <div class="doc-hero__meta-cell">
         <div class="doc-hero__meta-label">Effective Date</div>
-        <div class="doc-hero__meta-val">May 3, 2026</div>
+        <div class="doc-hero__meta-val">May 4, 2026</div>
       </div>
       <div class="doc-hero__meta-cell">
         <div class="doc-hero__meta-label">Service</div>
@@ -573,7 +573,7 @@ h1, h2, h3, h4, .font-display {
       </div>
       <div class="doc-hero__meta-cell">
         <div class="doc-hero__meta-label">Version</div>
-        <div class="doc-hero__meta-val">v1.0.0</div>
+        <div class="doc-hero__meta-val">v1.1.0</div>
       </div>
       <div class="doc-hero__meta-cell">
         <div class="doc-hero__meta-label">Contact</div>
@@ -707,24 +707,42 @@ h1, h2, h3, h4, .font-display {
         <span class="doc-section__tag">Services</span>
       </div>
       <div class="doc-section__body">
-        <h4>// Economy & Profile System</h4>
+        <h4>// Economy, Profile & Progression System</h4>
         <ul>
-          <li>Virtual coin balances, experience points (EXP), and player profiles.</li>
-          <li>Leaderboards and statistics tracking wins, losses, draws, and total games played.</li>
-          <li>Daily bonuses, rewards, and lottery ticket systems.</li>
+          <li><strong>Virtual coins:</strong> Users receive and spend virtual coins through commands and game features. Coins are database values only and have no cash value.</li>
+          <li><strong>Experience and levels:</strong> The bot stores EXP and level information to show profile progression and user status.</li>
+          <li><strong>Profiles:</strong> Profile commands display virtual balance, EXP, level, ticket count for the current Lottery draw, achievements, and public game statistics.</li>
+          <li><strong>Daily reward:</strong> Users may claim a configured daily virtual coin reward subject to a cooldown timestamp stored by the bot.</li>
+          <li><strong>Transfers:</strong> Users may transfer virtual coins to other users through economy commands when enabled by the bot's command set. Transfers are final unless reversed by the bot owner for abuse, bug recovery, or moderation reasons.</li>
+          <li><strong>Achievements:</strong> The bot tracks achievement unlocks based on game and economy activity. Achievements are virtual status markers only.</li>
+          <li><strong>Leaderboards:</strong> The bot may display leaderboards for coins, EXP, levels, wins, profit, wagered amounts, achievements, and other tracked virtual statistics.</li>
+          <li><strong>Statistics:</strong> The bot stores aggregate wins, losses, draws, total games, total bets, total payouts, net profit, streaks, biggest bets, biggest wins, and per-game statistics.</li>
         </ul>
         <h4 style="margin-top:1.2rem;">// Casino-Style Games</h4>
         <ul>
-          <li>Blackjack — classic card game with standard rules.</li>
-          <li>Coin Flip — heads or tails betting mechanic.</li>
-          <li>Lottery — ticket-based draw system with scheduled results.</li>
-          <li>Sicbo — dice-based wagering game.</li>
-          <li>Additional games may be added or removed at any time without prior notice.</li>
+          <li><strong>Blackjack:</strong> A single-player card game against the dealer. The bot stores the active bet, cards, deck state, and message references until the game resolves.</li>
+          <li><strong>Coin Flip:</strong> A delayed heads/tails game. The bot subtracts the bet at start, stores the choice and resolve timestamp, then edits the original message when the result is generated.</li>
+          <li><strong>Lottery:</strong> A global draw system using virtual tickets, chosen or random 4-digit numbers, configured draw intervals, fixed lower-tier payouts, and a virtual jackpot pool. Current-draw tickets are deleted after each draw.</li>
+          <li><strong>Sicbo:</strong> A global round-based dice game where users bet on Big or Small before the round closes. Results are generated from virtual dice and the round advances automatically.</li>
+          <li><strong>Baucua:</strong> A global round-based symbol betting game where users bet on Deer, Pear, Chicken, Fish, Crab, or Shrimp before the round closes. Payouts depend on matching result symbols.</li>
+          <li><strong>Lucky Mining:</strong> A real-time virtual economy feature where users buy virtual computers by tier, store deterministic virtual coin output based on elapsed time, and claim stored virtual coins after cooldown rules.</li>
+          <li>All game names, rules, payout rates, timers, limits, command names, and displayed results may be adjusted for balance, bug fixes, or service integrity.</li>
+          <li>Additional games or economy features may be added, adjusted, disabled, or removed at any time without prior notice.</li>
         </ul>
-        <h4 style="margin-top:1.2rem;">// Server Configuration</h4>
+        <h4 style="margin-top:1.2rem;">// Server Configuration & Discord Interface</h4>
         <ul>
-          <li>Administrative setup commands for announcement channels and server-specific settings.</li>
-          <li>Interactive Discord button components and embed messages for game results and announcements.</li>
+          <li>Administrative setup commands may store announcement channels and message IDs for Lottery, Sicbo, Baucua, or future global systems.</li>
+          <li>The bot uses Discord slash commands, prefix commands, embeds, buttons, message edits, and scheduled background tasks to operate game sessions and announcements.</li>
+          <li>Some game messages may be edited after they are sent to show final results, updated pools, remaining time, or announcement state.</li>
+          <li>Server administrators are responsible for granting the bot only the permissions needed for their server and restricting administrative commands to trusted staff.</li>
+        </ul>
+        <h4 style="margin-top:1.2rem;">// Current Command Areas</h4>
+        <ul>
+          <li><strong>Economy:</strong> Balance, daily reward, and virtual coin transfer commands such as balance/bal, daily, and give.</li>
+          <li><strong>Profile and leaderboards:</strong> Profile pages, achievement pages, and top rankings for coins, level, wins, profit, bet volume, and achievements.</li>
+          <li><strong>Games:</strong> Blackjack, Coin Flip, Lottery, Sicbo, Baucua, and Lucky Mining command groups with both slash and prefix access where implemented.</li>
+          <li><strong>Help:</strong> Help pages describe the active command set and may change when commands are added, renamed, restricted, or removed.</li>
+          <li>Command availability may differ by server permissions, Discord client support, bot configuration, command sync state, or temporary feature restrictions.</li>
         </ul>
       </div>
     </div>
@@ -737,12 +755,14 @@ h1, h2, h3, h4, .font-display {
       </div>
       <div class="doc-section__body">
         <ul>
-          <li>All coins, tickets, experience points, statistics, and game outcomes are entirely virtual and have no monetary value whatsoever.</li>
-          <li>Virtual balances cannot be exchanged, transferred, sold, or redeemed for money, goods, services, cryptocurrency, gift cards, or any other tangible value in the real world.</li>
-          <li>Game outcomes may be determined by random or pseudo-random logic and are provided solely for entertainment.</li>
-          <li>We do not guarantee any specific game outcomes, win rates, or return percentages.</li>
-          <li>We may adjust, reset, redistribute, or permanently remove virtual data — including balances, statistics, and game states — when necessary to fix bugs, maintain service integrity, prevent abuse, or for any other operational reason, without prior notice or compensation.</li>
-          <li>Accumulation of large virtual balances does not confer any right, claim, or expectation of real-world value now or in the future.</li>
+          <li>All coins, tickets, jackpots, experience points, levels, achievements, mining computers, game states, statistics, payouts, and outcomes are entirely virtual and have no monetary value whatsoever.</li>
+          <li>Virtual balances cannot be exchanged, transferred outside the bot, sold, purchased, withdrawn, or redeemed for money, goods, services, cryptocurrency, gift cards, Discord Nitro, server perks, or any other tangible or intangible real-world value.</li>
+          <li>Game outcomes may be determined by random or pseudo-random logic. Lucky Mining output is deterministic based on configured virtual income rates and elapsed time. All features are provided solely for entertainment.</li>
+          <li>We do not guarantee any specific game outcomes, win rates, return percentages, jackpot frequency, leaderboard position, mining yield, or virtual profit.</li>
+          <li>Published payout multipliers, ticket prices, mining rates, reward amounts, cooldowns, limits, and jackpot formulas are configuration values and may change at any time.</li>
+          <li>We may adjust, reset, redistribute, rollback, or permanently remove virtual data — including balances, tickets, mining computers, achievements, statistics, and game states — when necessary to fix bugs, maintain service integrity, prevent abuse, recover from database problems, or for any other operational reason, without prior notice or compensation.</li>
+          <li>Accumulation of large virtual balances, rare outcomes, achievements, jackpot wins, or high leaderboard rank does not confer any right, claim, ownership interest, or expectation of real-world value now or in the future.</li>
+          <li>If a command result, payout, draw, or calculation is affected by a bug, exploit, outage, duplicate interaction, or database error, the bot owner may correct the affected virtual records at their discretion.</li>
         </ul>
       </div>
     </div>
@@ -762,12 +782,13 @@ h1, h2, h3, h4, .font-display {
         <p>You agree that while using LuckyBot+, you will not:</p>
         <ul>
           <li>Harass, threaten, intimidate, impersonate, or abuse any other users through bot interactions.</li>
-          <li>Exploit bugs, vulnerabilities, race conditions, or unintended mechanics to gain unfair virtual currency or advantages.</li>
-          <li>Use self-bots, automation scripts, macros, user-bots, or any unauthorized third-party tools to interact with the bot.</li>
-          <li>Attempt to reverse-engineer, decompile, disassemble, or otherwise extract the source code or internal logic of the bot.</li>
-          <li>Attempt to disrupt, overload, attack, flood, or interfere with the bot's normal operation, database, or hosting infrastructure.</li>
-          <li>Coordinate with other users to manipulate leaderboards, lottery outcomes, or other competitive systems unfairly.</li>
-          <li>Use the bot in any way that violates Discord's Terms, Community Guidelines, or any applicable laws and regulations.</li>
+          <li>Exploit bugs, vulnerabilities, race conditions, duplicate interactions, command desynchronization, restart behavior, or unintended mechanics to gain unfair virtual currency or advantages.</li>
+          <li>Use self-bots, automation scripts, macros, user-bots, command spam, or any unauthorized third-party tools to interact with the bot.</li>
+          <li>Attempt to reverse-engineer, decompile, disassemble, scrape, or otherwise extract the source code, database structure, tokens, credentials, or internal logic of the bot.</li>
+          <li>Attempt to disrupt, overload, attack, flood, rate-limit, or interfere with the bot's normal operation, database, scheduler tasks, Discord API usage, or hosting infrastructure.</li>
+          <li>Coordinate with other users to manipulate leaderboards, lottery outcomes, Sicbo/Baucua global rounds, mining progression, transfers, achievements, or other competitive systems unfairly.</li>
+          <li>Use alt accounts, collusion, or repeated transfers to evade limits, inflate statistics, launder virtual coins, or bypass moderation decisions.</li>
+          <li>Use the bot in any way that violates Discord's Terms, Community Guidelines, Developer Terms, or any applicable laws and regulations.</li>
         </ul>
       </div>
     </div>
@@ -780,10 +801,11 @@ h1, h2, h3, h4, .font-display {
       </div>
       <div class="doc-section__body">
         <ul>
-          <li>Server administrators and owners are responsible for properly configuring the bot's permissions and channel restrictions for their community.</li>
-          <li>Administrative commands and sensitive setup functions should be restricted to trusted server staff using Discord's built-in permission system.</li>
-          <li>Server owners accept responsibility for how the bot is used within their server and must ensure use is appropriate for their audience.</li>
-          <li>We are not responsible for server-specific moderation decisions, permission misconfigurations, disputes between server members, or misuse of administrative features by server staff.</li>
+          <li>Server administrators and owners are responsible for properly configuring the bot's permissions, channel access, role access, and command visibility for their community.</li>
+          <li>Administrative commands and sensitive setup functions, including announcement channel setup, should be restricted to trusted server staff using Discord's built-in permission system.</li>
+          <li>Server owners accept responsibility for how the bot is used within their server and must ensure use is appropriate for their audience, local laws, and community rules.</li>
+          <li>The bot may require message content intent for prefix commands and permissions to send messages, embed links, use external emojis, read message history, and edit its own messages.</li>
+          <li>We are not responsible for server-specific moderation decisions, permission misconfigurations, disputes between server members, accidental command exposure, or misuse of administrative features by server staff.</li>
           <li>We reserve the right to remove the bot from any server we determine is using it inappropriately, without notice or appeal.</li>
         </ul>
       </div>
@@ -803,7 +825,7 @@ h1, h2, h3, h4, .font-display {
       <div class="doc-section__body">
         <p>LuckyBot+ is provided on an "as is" and "as available" basis without any warranties of any kind, express or implied. We specifically disclaim any implied warranties of merchantability, fitness for a particular purpose, and non-infringement.</p>
         <ul>
-          <li>We may update, modify, expand, restrict, or discontinue any features at any time with or without notice.</li>
+          <li>We may update, modify, rebalance, expand, restrict, or discontinue any features, commands, payouts, mining rates, ticket limits, or economy values at any time with or without notice.</li>
           <li>We do not guarantee uninterrupted, error-free, or secure operation of the bot at any time.</li>
           <li>We do not guarantee permanent storage or retention of virtual data, game states, or user profiles.</li>
           <li>Scheduled maintenance, bot restarts, or Discord platform outages may temporarily disrupt service.</li>
@@ -822,7 +844,7 @@ h1, h2, h3, h4, .font-display {
         <p>We reserve the right to take enforcement action at our sole discretion, including but not limited to:</p>
         <ul>
           <li>Restricting or revoking a user's access to bot commands, features, or services.</li>
-          <li>Resetting, adjusting, or permanently deleting a user's virtual balance, statistics, or stored data.</li>
+          <li>Resetting, adjusting, or permanently deleting a user's virtual balance, statistics, achievements, mining computers, tickets, game states, or stored data.</li>
           <li>Blacklisting individual users or entire Discord servers from using the bot.</li>
           <li>Removing the bot from servers where these Terms, Discord's policies, or applicable laws are being violated.</li>
         </ul>

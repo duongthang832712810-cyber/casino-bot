@@ -67,6 +67,7 @@
 - Lottery -- Multi-tier jackpot pool system
 - Sicbo -- Global round-based Big/Small dice game
 - Baucua -- Global round-based symbol betting game
+- Lucky Mining -- Real-time computer mining economy feature
 
 </td>
 <td width="50%">
@@ -103,7 +104,8 @@ LuckyBot+/
 |   |   |-- coinflip.py           # Coin Flip delay & payout config
 |   |   |-- lottery.py            # Lottery draw, jackpot & tier config
 |   |   |-- sicbo.py              # Sicbo round, bet & display config
-|   |   `-- baucua.py             # Baucua round, bet & display config
+|   |   |-- baucua.py             # Baucua round, bet & display config
+|   |   `-- mining.py             # Lucky Mining computer price, income & cooldown config
 |   |-- core/                     # Setup, constants, errors, checks, logging
 |   |-- db/                       # SQLite connection, schema, migrations
 |   |-- games/                    # Game packages
@@ -324,6 +326,25 @@ The Baucua result embed deletes losing bettor names and shows only winning field
 
 ---
 
+### Lucky Mining
+
+| Command | Description |
+|:--------|:------------|
+| `/mine shop` | View the Lucky Mining computer shop |
+| `/mine buy <tier>` | Buy a tier 1-7 mining computer |
+| `/mine computer` | View your owned computers and stored coins |
+| `/mine claim` | Claim coins generated since your last claim |
+| `/mine info` | View Lucky Mining rules |
+| `!mine shop` | Prefix shop command |
+| `!mine buy <tier>` | Prefix buy command |
+| `!mine computer` | Prefix computers command |
+| `!mine claim` | Prefix claim command |
+| `!mine info` | Prefix info command |
+
+Lucky Mining uses real elapsed time. Coins are calculated from the time since the computer was last claimed, capped by the configured storage window. Computers cannot be sold yet, and buying another computer of the same tier increases only that tier's next price.
+
+---
+
 ### Help
 
 ```
@@ -337,6 +358,7 @@ The Baucua result embed deletes losing bettor names and shows only winning field
 | 3 | Lottery |
 | 4 | Sicbo |
 | 5 | Baucua |
+| 6 | Lucky Mining |
 
 Use the navigation buttons to switch between pages.
 
@@ -398,6 +420,7 @@ All tunable values live in `src/config/`. Game logic never hardcodes numbers. St
 | `lottery.py` | Ticket price, tier payouts, jackpot seed, house edge rate |
 | `sicbo.py` | Round duration, min/max bet, payout multiplier |
 | `baucua.py` | Round duration, min/max bet, payout multiplier, displayed bettor limit |
+| `mining.py` | Lucky Mining computer prices, daily income, storage cap, claim cooldown, and same-tier price multiplier |
 | `emojis.py` | All custom emoji IDs -- single source of truth |
 | `footer.py` | Random footer message pool for embeds |
 
@@ -421,6 +444,8 @@ Schema is defined in `src/db/schema.sql` and migrated automatically on startup.
 | `baucua_state` | Current Baucua round state |
 | `baucua_bets` | All bets placed in the current Baucua round |
 | `baucua_announcements` | Announcement channel & message ID references |
+| `mining_computers` | Owned Lucky Mining computers, tier, purchase price, and last claim timestamp |
+| `mining_stats` | Lucky Mining total claimed coins, purchase count, highest tier, and claim cooldown timestamp |
 | `user_game_stats` | Per-user, per-game wins/losses/draws, streaks, bet, payout, and profit stats |
 | `user_achievements` | Unlocked achievements per user |
 

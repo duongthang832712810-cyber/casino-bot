@@ -22,18 +22,22 @@ def render_sicbo_embed(state: SicboState, bets: list[SicboBet], bot_name: str | 
     else:
         embed.description = "Betting is closed."
 
-    embed.add_field(name="Total Big Bets", value=_choice_field_value(bets, CHOICE_BIG), inline=True)
+    embed.add_field(name="Total Big Bets", value=_choice_field_value(state, bets, CHOICE_BIG), inline=True)
     embed.add_field(name=ZERO_WIDTH, value=_middle_field_value(state), inline=True)
-    embed.add_field(name="Total Small Bets", value=_choice_field_value(bets, CHOICE_SMALL), inline=True)
+    embed.add_field(name="Total Small Bets", value=_choice_field_value(state, bets, CHOICE_SMALL), inline=True)
     embed.set_footer(text=random_footer_text(bot_name))
     return embed
 
 
-def _choice_field_value(bets: list[SicboBet], choice: str) -> str:
+def _choice_field_value(state: SicboState, bets: list[SicboBet], choice: str) -> str:
     choice_bets = [bet for bet in bets if bet.choice == choice]
     total = sum(bet.amount for bet in choice_bets)
     label = "Big bettors" if choice == CHOICE_BIG else "Small bettors"
     lines = [format_coin(total), "", label]
+
+    if state.status != STATUS_BETTING and state.result != choice:
+        lines.append("No winning bets shown.")
+        return "\n".join(lines)
 
     if not choice_bets:
         lines.append("No bets yet.")

@@ -219,6 +219,41 @@ CREATE TABLE IF NOT EXISTS baucua_announcements (
 
 CREATE INDEX IF NOT EXISTS idx_baucua_announcements_channel_id ON baucua_announcements(channel_id);
 
+CREATE TABLE IF NOT EXISTS mining_computers (
+    computer_id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+    user_id TEXT NOT NULL,
+    tier INTEGER NOT NULL CHECK (tier BETWEEN 1 AND 7),
+    purchase_price INTEGER NOT NULL CHECK (purchase_price > 0),
+
+    purchased_at INTEGER NOT NULL,
+    last_claimed_at INTEGER NOT NULL,
+
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL,
+
+    FOREIGN KEY(user_id) REFERENCES users(user_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_mining_computers_user_id ON mining_computers(user_id);
+CREATE INDEX IF NOT EXISTS idx_mining_computers_user_tier ON mining_computers(user_id, tier);
+
+CREATE TABLE IF NOT EXISTS mining_stats (
+    user_id TEXT PRIMARY KEY,
+
+    total_claimed INTEGER NOT NULL DEFAULT 0 CHECK (total_claimed >= 0),
+    computers_bought INTEGER NOT NULL DEFAULT 0 CHECK (computers_bought >= 0),
+    highest_tier INTEGER NOT NULL DEFAULT 0 CHECK (highest_tier >= 0),
+    last_claimed_at INTEGER NOT NULL DEFAULT 0,
+
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL,
+
+    FOREIGN KEY(user_id) REFERENCES users(user_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_mining_stats_total_claimed ON mining_stats(total_claimed);
+
 CREATE TABLE IF NOT EXISTS user_game_stats (
     user_id TEXT NOT NULL,
     game_type TEXT NOT NULL,
@@ -262,3 +297,16 @@ CREATE TABLE IF NOT EXISTS user_achievements (
 
 CREATE INDEX IF NOT EXISTS idx_user_achievements_user_id ON user_achievements(user_id);
 CREATE INDEX IF NOT EXISTS idx_user_achievements_game_type ON user_achievements(game_type);
+
+CREATE TABLE IF NOT EXISTS backup_settings (
+    id INTEGER PRIMARY KEY CHECK (id = 1),
+
+    channel_id TEXT,
+    message_id TEXT,
+    interval_seconds INTEGER NOT NULL DEFAULT 3600 CHECK (interval_seconds >= 300),
+    enabled INTEGER NOT NULL DEFAULT 0,
+    last_backup_at INTEGER NOT NULL DEFAULT 0,
+
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL
+);
